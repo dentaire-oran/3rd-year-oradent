@@ -498,6 +498,7 @@ App.admin.resetCompte = function (num) {
     });
 };
 
+// NOUVELLE FONCTION saveSuperAdmins (avec Supabase)
 App.admin.saveSuperAdmins = async function () {
   var newAdminId = document.getElementById("superAdminId").value.trim();
   var newAdminPass = document.getElementById("superAdminPass").value.trim();
@@ -509,20 +510,23 @@ App.admin.saveSuperAdmins = async function () {
     return;
   }
 
+  // Mise à jour des variables globales
+  ADMIN_ID = newAdminId;
+  ADMIN_LITE_ID = newLiteId;
   if (newAdminPass) {
     ADMIN_MDP_HASH = await sha256(newAdminPass);
-    localStorage.setItem("admin_hash_v2", ADMIN_MDP_HASH);
   }
   if (newLitePass) {
     ADMIN_LITE_MDP_HASH = await sha256(newLitePass);
-    localStorage.setItem("admin_lite_hash_v2", ADMIN_LITE_MDP_HASH);
   }
-  ADMIN_ID = newAdminId;
-  ADMIN_LITE_ID = newLiteId;
-  localStorage.setItem("admin_id_v2", ADMIN_ID);
-  localStorage.setItem("admin_lite_id_v2", ADMIN_LITE_ID);
 
-  // Enregistrement dans Supabase
+  // Sauvegarde dans le localStorage
+  localStorage.setItem("admin_id_v2", ADMIN_ID);
+  localStorage.setItem("admin_hash_v2", ADMIN_MDP_HASH);
+  localStorage.setItem("admin_lite_id_v2", ADMIN_LITE_ID);
+  localStorage.setItem("admin_lite_hash_v2", ADMIN_LITE_MDP_HASH);
+
+  // Fonction upsert vers Supabase
   var upsert = function (role, username, hash) {
     return fetch(SUPABASE_URL + "/rest/v1/admin_accounts", {
       method: "POST",
@@ -541,19 +545,14 @@ App.admin.saveSuperAdmins = async function () {
     });
   };
 
-  upsert("admin", ADMIN_ID, ADMIN_MDP_HASH)
-    .then(function () {
-      if (newAdminPass || newAdminId) {
-        return upsert("admin_lite", ADMIN_LITE_ID, ADMIN_LITE_MDP_HASH);
-      }
-    })
-    .then(function () {
-      showToast(t("accountUpdated"), "success");
-    })
-    .catch(function (err) {
-      console.warn("Supabase admin_accounts save failed, using localStorage only.", err);
-      showToast(t("accountUpdated") + " (local only)", "warning");
-    });
+  try {
+    await upsert("admin", ADMIN_ID, ADMIN_MDP_HASH);
+    await upsert("admin_lite", ADMIN_LITE_ID, ADMIN_LITE_MDP_HASH);
+    showToast(t("accountUpdated"), "success");
+  } catch (err) {
+    console.warn("Sauvegarde Supabase échouée, localStorage utilisé.", err);
+    showToast(t("accountUpdated") + " (local only)", "warning");
+  }
 };
 
 App.admin.openEditNotes = function (num) {
@@ -1101,7 +1100,6 @@ App.admin.savePeerView = function () {
     });
 };
 
-// --- Classement ---
 App.admin.rankModuleChanged = function () {
   var val = document.getElementById("rankModuleSelect").value;
   var subWrap = document.getElementById("rankSubSelectWrap");
