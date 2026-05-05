@@ -11,16 +11,11 @@ App.admin.loadAdmin = function () {
   else badge.classList.add("hidden");
 
   var leaveBtn = document.getElementById("leaveAdminLiteBtn");
-if (viewingAsAdminLite || window._studentAdmin) {
+  if (viewingAsAdminLite || window._studentAdmin) {
     leaveBtn.style.display = "inline-flex";
-} else {
+  } else {
     leaveBtn.style.display = "none";
-}
-
-  <button class="btn-ghost" id="leaveAdminLiteBtn" style="display:none;" 
-  onclick="if(window._studentAdmin){App.student.leaveAdminModeStudent();}else{App.student.leaveAdminLiteMode();}">
-  <i class="ph-bold ph-arrow-left"></i> <span>Retour à mon compte</span>
-</button>
+  }
 
   document.getElementById("adminBody").innerHTML =
     '<tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--text-muted);">' +
@@ -355,10 +350,11 @@ App.admin.renderComptes = function (data) {
     html += '</div>';
   }
 
-  // --- TABLEAU DES COMPTES ÉTUDIANTS ---
+  // --- TABLEAU DES COMPTES ÉTUDIANTS (avec colonne Rôle) ---
   html += '<div class="glass rounded-3xl overflow-hidden"><div style="overflow-x:auto;"><table class="res-table"><thead><tr>' +
     "<th>" + t("number") + "</th><th>" + t("lastName") + "</th><th>" + t("firstName") + "</th>" +
     "<th>" + t("customIdentifier") + "</th><th>" + t("customPassword") + "</th><th>" + t("actions") + "</th>" +
+    "<th>Rôle</th>" +
     "</tr></thead><tbody>";
 
   data.forEach(function (et) {
@@ -375,12 +371,25 @@ App.admin.renderComptes = function (data) {
         '<button class="btn-sm btn-info-sm" onclick="App.admin.editStudentAccount(' + et.numero + ')"><i class="ph-bold ph-pencil"></i> ' + t("editAccount") + '</button> ' +
         '<button class="btn-sm btn-danger-sm" onclick="App.admin.resetCompte(' + et.numero + ')"><i class="ph-bold ph-arrow-counter-clockwise"></i> ' + t("reset") + '</button>';
     }
+
+    var currentRole = et.role || 'etudiant';
+    var roleHtml = '';
+    if (!isAdminLite) {
+      roleHtml = '<select class="glass-select" style="width:auto;padding:0.3rem 0.5rem;" id="role_' + et.numero + '" onchange="App.admin.changeStudentRole(' + et.numero + ')">' +
+        '<option value="etudiant"' + (currentRole === 'etudiant' ? ' selected' : '') + '>Étudiant</option>' +
+        '<option value="admin"' + (currentRole === 'admin' ? ' selected' : '') + '>Admin</option>' +
+        '</select>';
+    } else {
+      roleHtml = currentRole === 'admin' ? '<span class="badge badge-al">Admin</span>' : 'Étudiant';
+    }
+
     html += "<tr>" +
       '<td class="mono" style="font-weight:700;">' + et.numero + '</td>' +
       '<td style="font-weight:600;">' + et.nom + '</td><td>' + et.prenom + '</td>' +
       '<td class="mono">' + identifiant + '</td>' +
       '<td class="mono" style="word-break:break-all;">' + motdepasse + '</td>' +
       '<td>' + actionCell + '</td>' +
+      '<td>' + roleHtml + '</td>' +
       '</tr>';
   });
   html += "</tbody></table></div></div>";
@@ -444,7 +453,24 @@ App.admin.resetCompte = function (num) {
     .catch(function () { showToast(t("saveError"), "danger"); });
 };
 
-// ******** SAUVEGARDE DES SUPER-ADMINS (correction réponse vide) ********
+App.admin.changeStudentRole = function(num) {
+  var select = document.getElementById('role_' + num);
+  if (!select) return;
+  var newRole = select.value;
+  fsPatch("etudiants", String(num), { role: newRole })
+    .then(function() {
+      var et = adminData.find(function(e){ return e.numero === num; });
+      if (et) et.role = newRole;
+      showToast("Rôle mis à jour.", "success");
+      App.admin.renderComptes(adminData);
+    })
+    .catch(function(err) {
+      console.error(err);
+      showToast("Erreur lors de la mise à jour du rôle.", "danger");
+    });
+};
+
+// ******** SAUVEGARDE DES SUPER-ADMINS ********
 App.admin.saveSuperAdmins = async function () {
   var currentPass = document.getElementById("currentAdminPass").value.trim();
   var newAdminId = document.getElementById("superAdminId").value.trim();
@@ -509,7 +535,6 @@ App.admin.saveSuperAdmins = async function () {
       throw new Error("Erreur " + response.status + " : " + errorText);
     }
 
-    // La réponse peut être vide (204 No Content) ou contenir un JSON
     var text = await response.text();
     return text ? JSON.parse(text) : null;
   };
