@@ -105,6 +105,14 @@ App.student.leaveAdminLiteMode = function() {
   if (currentStudent) App.student.renderStudent(currentStudent);
 };
 
+// ... (le code existant du bouton Admin Lite)
+var btnAdminFull = document.getElementById("btnAdminFullAccess");
+if (et.role === 'admin') {
+    btnAdminFull.style.display = "inline-flex";
+} else {
+    btnAdminFull.style.display = "none";
+}
+
 App.student.showAccount = function() {
   if (!currentStudent) return;
   document.getElementById("accountSubtitle").textContent = currentStudent.nom+" "+currentStudent.prenom+" — N° "+currentStudent.numero;
