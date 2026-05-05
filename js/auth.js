@@ -1,21 +1,47 @@
 var App = App || {};
 App.auth = {};
 
+// Valeurs par défaut (fallback si Supabase est injoignable)
 var ADMIN_ID = "admin";
 var ADMIN_MDP_HASH = "2e3c969e2e9b367ade00279743f88ea0e32f283152223e3d9aaf1c14669d7cbe";
 var ADMIN_LITE_ID = "user";
 var ADMIN_LITE_MDP_HASH = "90d06112d5dc4274afd6ba187432cbf203586566e2ffe87b7494e9b1e1268187";
 
-(function() {
-  var storedAdminId = localStorage.getItem("admin_id_v2");
-  var storedAdminHash = localStorage.getItem("admin_hash_v2");
-  if (storedAdminId) ADMIN_ID = storedAdminId;
-  if (storedAdminHash) ADMIN_MDP_HASH = storedAdminHash;
-
-  var storedLiteId = localStorage.getItem("admin_lite_id_v2");
-  var storedLiteHash = localStorage.getItem("admin_lite_hash_v2");
-  if (storedLiteId) ADMIN_LITE_ID = storedLiteId;
-  if (storedLiteHash) ADMIN_LITE_MDP_HASH = storedLiteHash;
+// Chargement des identifiants depuis Supabase (écrase les valeurs par défaut si trouvées)
+(function loadAdminCredentials() {
+  fetch(SUPABASE_URL + "/rest/v1/admin_accounts?select=role,username,password_hash", {
+    headers: SB_HEADERS
+  })
+    .then(function(r) { return r.json(); })
+    .then(function(rows) {
+      if (rows && rows.length) {
+        rows.forEach(function(r) {
+          if (r.role === "admin") {
+            ADMIN_ID = r.username;
+            ADMIN_MDP_HASH = r.password_hash;
+          } else if (r.role === "admin_lite") {
+            ADMIN_LITE_ID = r.username;
+            ADMIN_LITE_MDP_HASH = r.password_hash;
+          }
+        });
+        // Mettre à jour le localStorage pour cohérence
+        localStorage.setItem("admin_id_v2", ADMIN_ID);
+        localStorage.setItem("admin_hash_v2", ADMIN_MDP_HASH);
+        localStorage.setItem("admin_lite_id_v2", ADMIN_LITE_ID);
+        localStorage.setItem("admin_lite_hash_v2", ADMIN_LITE_MDP_HASH);
+      }
+    })
+    .catch(function() {
+      // Fallback : on garde les valeurs par défaut ou le localStorage
+      var storedAdminId = localStorage.getItem("admin_id_v2");
+      if (storedAdminId) ADMIN_ID = storedAdminId;
+      var storedAdminHash = localStorage.getItem("admin_hash_v2");
+      if (storedAdminHash) ADMIN_MDP_HASH = storedAdminHash;
+      var storedLiteId = localStorage.getItem("admin_lite_id_v2");
+      if (storedLiteId) ADMIN_LITE_ID = storedLiteId;
+      var storedLiteHash = localStorage.getItem("admin_lite_hash_v2");
+      if (storedLiteHash) ADMIN_LITE_MDP_HASH = storedLiteHash;
+    });
 })();
 
 App.auth.saveSession = function(v) { localStorage.setItem(SESSION_KEY, String(v)); };
