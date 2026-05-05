@@ -20,6 +20,25 @@ App.student.renderStudent = function(et) {
     extraMoyHtml += '<div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:'+pct+'%;"></div></div>';
     extraMoyHtml += getGradeBadge(moyNum);
   }
+
+  App.student.enterAdminMode = function() {
+  window._studentAdmin = true;
+  isAdmin = true;
+  isAdminLite = false;
+  App.showView("admin");
+  App.admin.loadAdmin();
+  document.getElementById("leaveAdminLiteBtn").style.display = "inline-flex";
+  document.getElementById("adminLiteBadge").classList.add("hidden");
+};
+
+App.student.leaveAdminModeStudent = function() {
+  window._studentAdmin = false;
+  isAdmin = false;
+  isAdminLite = false;
+  document.getElementById("leaveAdminLiteBtn").style.display = "none";
+  App.showView("student");
+  if (currentStudent) App.student.renderStudent(currentStudent);
+};
   document.getElementById("statMoyExtra").innerHTML = extraMoyHtml;
 
   var extraRankHtml = getRankBadge(et.classement);
