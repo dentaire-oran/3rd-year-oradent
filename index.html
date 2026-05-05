@@ -19,6 +19,7 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+
 <!-- SIDEBAR -->
 <div id="sidebar" class="fixed inset-y-0 z-50 w-80 glass transition-transform duration-500 ease-out flex flex-col" style="background:var(--sidebar-bg);">
   <div class="p-8 pt-24 flex flex-col h-full overflow-y-auto">
@@ -86,9 +87,12 @@
         <button class="btn-ghost" id="btnAdminLiteAccess" style="display:none;" onclick="App.student.enterAdminLiteMode()">
           <i class="ph-bold ph-shield"></i> <span>Admin Lite</span>
         </button>
-        <!-- Bouton Admin complet (visible seulement pour étudiants promus admin) -->
         <button class="btn-ghost" id="btnAdminFullAccess" style="display:none;" onclick="App.student.enterAdminMode()">
           <i class="ph-bold ph-shield-check"></i> <span>Admin</span>
+        </button>
+        <!-- Bouton Simuler ma moyenne (visible pour tous les étudiants) -->
+        <button class="btn-ghost" id="btnSimulerMoyenne" style="display:none;" onclick="App.student.openSimulator()">
+          <i class="ph-bold ph-calculator"></i> <span>Simuler ma moyenne</span>
         </button>
       </div>
     </div>
