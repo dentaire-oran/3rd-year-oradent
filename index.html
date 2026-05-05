@@ -183,6 +183,9 @@
         <i class="ph-bold ph-magnifying-glass" style="color:var(--text-muted);"></i>
         <input type="text" id="adminSearch" data-i18n-placeholder="search" placeholder="Rechercher..." oninput="App.admin.filterAdmin()" style="background:none;border:none;outline:none;padding:0.65rem 0.75rem;color:var(--text-main);width:200px;">
       </div>
+      <button class="btn-ghost" id="btnAdminFullAccess" style="display:none;" onclick="App.student.enterAdminMode()">
+      <i class="ph-bold ph-shield-check"></i> <span>Admin</span>
+      </button>
       <button class="btn-ghost" id="leaveAdminLiteBtn" style="display:none;" onclick="App.student.leaveAdminLiteMode()"><i class="ph-bold ph-arrow-left"></i> <span>Retour à mon compte</span></button>
       <button class="btn-ghost" onclick="App.auth.logout()"><i class="ph-bold ph-sign-out"></i> <span data-i18n="logout">Déconnexion</span></button>
     </div>
