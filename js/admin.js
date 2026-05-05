@@ -10,6 +10,13 @@ App.admin.loadAdmin = function () {
   if (isAdminLite) badge.classList.remove("hidden");
   else badge.classList.add("hidden");
 
+  var leaveBtn = document.getElementById("leaveAdminLiteBtn");
+if (viewingAsAdminLite || window._studentAdmin) {
+    leaveBtn.style.display = "inline-flex";
+} else {
+    leaveBtn.style.display = "none";
+}
+
   <button class="btn-ghost" id="leaveAdminLiteBtn" style="display:none;" 
   onclick="if(window._studentAdmin){App.student.leaveAdminModeStudent();}else{App.student.leaveAdminLiteMode();}">
   <i class="ph-bold ph-arrow-left"></i> <span>Retour à mon compte</span>
