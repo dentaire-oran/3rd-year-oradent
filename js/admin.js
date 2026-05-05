@@ -11,8 +11,11 @@ App.admin.loadAdmin = function () {
   else badge.classList.add("hidden");
 
   var leaveBtn = document.getElementById("leaveAdminLiteBtn");
-  leaveBtn.style.display = viewingAsAdminLite ? "inline-flex" : "none";
-
+if (viewingAsAdminLite || window._studentAdmin) {
+    leaveBtn.style.display = "inline-flex";
+} else {
+    leaveBtn.style.display = "none";
+}
   document.getElementById("adminBody").innerHTML =
     '<tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--text-muted);">' +
     t("loading") +
