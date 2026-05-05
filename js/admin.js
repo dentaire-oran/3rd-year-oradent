@@ -386,29 +386,27 @@ App.admin.renderComptes = function (data) {
   });
   html += "</tbody></table></div></div>";
 
+  // Bloc "Modifier les super-admins" avec champs supplémentaires
   if (!isAdminLite) {
     html += '<div class="glass rounded-3xl p-6 mt-6">';
-    html +=
-      '<h3 class="font-bold text-lg mb-4 flex items-center gap-2"><i class="ph-bold ph-shield-check"></i> ' +
-      t("editSuperAdmin") +
-      "</h3>";
-    html +=
-      '<div style="margin-bottom:1rem;"><label class="field-label">Admin ID</label><input type="text" class="calc-input" id="superAdminId" value="' +
-      ADMIN_ID +
-      '"></div>';
-    html +=
-      '<div style="margin-bottom:1rem;"><label class="field-label">Admin Password (laisser vide pour ne pas changer)</label><input type="password" class="calc-input" id="superAdminPass" placeholder="Nouveau mot de passe"></div>';
-    html +=
-      '<div style="margin-bottom:1rem;"><label class="field-label">Admin Lite ID</label><input type="text" class="calc-input" id="superAdminLiteId" value="' +
-      ADMIN_LITE_ID +
-      '"></div>';
-    html +=
-      '<div style="margin-bottom:1rem;"><label class="field-label">Admin Lite Password (laisser vide pour ne pas changer)</label><input type="password" class="calc-input" id="superAdminLitePass" placeholder="Nouveau mot de passe"></div>';
-    html +=
-      '<button class="btn-main" style="width:auto;padding:0.6rem 1.8rem;" onclick="App.admin.saveSuperAdmins()"><i class="ph-bold ph-floppy-disk"></i> ' +
-      t("saveChanges") +
-      "</button>";
-    html += "</div>";
+    html += '<h3 class="font-bold text-lg mb-4 flex items-center gap-2"><i class="ph-bold ph-shield-check"></i> ' + t("editSuperAdmin") + '</h3>';
+
+    // Champ pour le mot de passe admin actuel (vérification)
+    html += '<div class="mb-3"><label class="field-label">Mot de passe admin actuel <span style="color:var(--danger);">*</span></label>';
+    html += '<input type="password" class="calc-input" id="currentAdminPass" placeholder="Obligatoire pour toute modification"></div>';
+
+    // Section Admin
+    html += '<div class="mb-3"><label class="field-label">Admin ID</label><input type="text" class="calc-input" id="superAdminId" value="' + ADMIN_ID + '"></div>';
+    html += '<div class="mb-3"><label class="field-label">Nouveau mot de passe Admin</label><input type="password" class="calc-input" id="superAdminPass" placeholder="Laisser vide pour ne pas changer"></div>';
+    html += '<div class="mb-3"><label class="field-label">Confirmer le nouveau mot de passe Admin</label><input type="password" class="calc-input" id="superAdminPassConfirm" placeholder="Confirmer"></div>';
+
+    // Section Admin Lite
+    html += '<div class="mb-3"><label class="field-label">Admin Lite ID</label><input type="text" class="calc-input" id="superAdminLiteId" value="' + ADMIN_LITE_ID + '"></div>';
+    html += '<div class="mb-3"><label class="field-label">Nouveau mot de passe Admin Lite</label><input type="password" class="calc-input" id="superAdminLitePass" placeholder="Laisser vide pour ne pas changer"></div>';
+    html += '<div class="mb-3"><label class="field-label">Confirmer le nouveau mot de passe Admin Lite</label><input type="password" class="calc-input" id="superAdminLitePassConfirm" placeholder="Confirmer"></div>';
+
+    html += '<button class="btn-main" style="width:auto;padding:0.6rem 1.8rem;" onclick="App.admin.saveSuperAdmins()"><i class="ph-bold ph-floppy-disk"></i> ' + t("saveChanges") + '</button>';
+    html += '</div>';
   }
 
   el.innerHTML = html;
@@ -498,15 +496,40 @@ App.admin.resetCompte = function (num) {
     });
 };
 
-// NOUVELLE FONCTION saveSuperAdmins (avec Supabase)
+// NOUVELLE VERSION de saveSuperAdmins avec vérification et confirmations
 App.admin.saveSuperAdmins = async function () {
+  var currentPass = document.getElementById("currentAdminPass").value.trim();
   var newAdminId = document.getElementById("superAdminId").value.trim();
   var newAdminPass = document.getElementById("superAdminPass").value.trim();
+  var newAdminPassConfirm = document.getElementById("superAdminPassConfirm").value.trim();
   var newLiteId = document.getElementById("superAdminLiteId").value.trim();
   var newLitePass = document.getElementById("superAdminLitePass").value.trim();
+  var newLitePassConfirm = document.getElementById("superAdminLitePassConfirm").value.trim();
 
+  // Vérification du mot de passe actuel obligatoire
+  if (!currentPass) {
+    showToast("Veuillez entrer votre mot de passe admin actuel.", "danger");
+    return;
+  }
+  var currentHash = await sha256(currentPass);
+  if (currentHash !== ADMIN_MDP_HASH) {
+    showToast("Mot de passe actuel incorrect.", "danger");
+    return;
+  }
+
+  // Vérification des IDs
   if (!newAdminId || !newLiteId) {
     showToast(t("fillAllFields"), "danger");
+    return;
+  }
+
+  // Vérification des confirmations de nouveau mot de passe
+  if (newAdminPass !== newAdminPassConfirm) {
+    showToast("Les nouveaux mots de passe Admin ne correspondent pas.", "danger");
+    return;
+  }
+  if (newLitePass !== newLitePassConfirm) {
+    showToast("Les nouveaux mots de passe Admin Lite ne correspondent pas.", "danger");
     return;
   }
 
@@ -526,7 +549,7 @@ App.admin.saveSuperAdmins = async function () {
   localStorage.setItem("admin_lite_id_v2", ADMIN_LITE_ID);
   localStorage.setItem("admin_lite_hash_v2", ADMIN_LITE_MDP_HASH);
 
-  // Fonction upsert vers Supabase
+  // Upsert vers Supabase
   var upsert = function (role, username, hash) {
     return fetch(SUPABASE_URL + "/rest/v1/admin_accounts", {
       method: "POST",
@@ -549,9 +572,12 @@ App.admin.saveSuperAdmins = async function () {
     await upsert("admin", ADMIN_ID, ADMIN_MDP_HASH);
     await upsert("admin_lite", ADMIN_LITE_ID, ADMIN_LITE_MDP_HASH);
     showToast(t("accountUpdated"), "success");
+    // Réafficher le formulaire mis à jour
+    App.admin.loadComptes();
   } catch (err) {
     console.warn("Sauvegarde Supabase échouée, localStorage utilisé.", err);
     showToast(t("accountUpdated") + " (local only)", "warning");
+    App.admin.loadComptes();
   }
 };
 
