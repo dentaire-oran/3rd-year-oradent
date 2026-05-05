@@ -105,6 +105,13 @@ App.student.leaveAdminLiteMode = function() {
   if (currentStudent) App.student.renderStudent(currentStudent);
 };
 
+var btnAdminFull = document.getElementById("btnAdminFullAccess");
+if (et.role === 'admin') {
+    btnAdminFull.style.display = "inline-flex";
+} else {
+    btnAdminFull.style.display = "none";
+};
+
 App.student.enterAdminMode = function() {
     window._studentAdmin = true;   // pour le bouton retour
     isAdmin = true;
