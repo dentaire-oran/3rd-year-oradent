@@ -81,6 +81,7 @@
         <button class="btn-ghost" id="btnAdminLiteAccess" style="display:none;" onclick="App.student.enterAdminLiteMode()">
           <i class="ph-bold ph-shield"></i> <span>Admin Lite</span>
         </button>
+        <!-- Bouton Admin complet (visible seulement pour étudiants promus admin) -->
         <button class="btn-ghost" id="btnAdminFullAccess" style="display:none;" onclick="App.student.enterAdminMode()">
           <i class="ph-bold ph-shield-check"></i> <span>Admin</span>
         </button>
@@ -186,13 +187,7 @@
         <i class="ph-bold ph-magnifying-glass" style="color:var(--text-muted);"></i>
         <input type="text" id="adminSearch" data-i18n-placeholder="search" placeholder="Rechercher..." oninput="App.admin.filterAdmin()" style="background:none;border:none;outline:none;padding:0.65rem 0.75rem;color:var(--text-main);width:200px;">
       </div>
-      <button class="btn-ghost" id="btnAdminFullAccess" style="display:none;" onclick="App.student.enterAdminMode()">
-      <i class="ph-bold ph-shield-check"></i> <span>Admin</span>
-      </button>
-      <button class="btn-ghost" id="leaveAdminLiteBtn" style="display:none;" 
-  onclick="if(window._studentAdmin){App.student.leaveAdminModeStudent();}else{App.student.leaveAdminLiteMode();}">
-  <i class="ph-bold ph-arrow-left"></i> <span>Retour à mon compte</span>
-      </button>
+      <button class="btn-ghost" id="leaveAdminLiteBtn" style="display:none;" onclick="if(window._studentAdmin){App.student.leaveAdminModeStudent();}else{App.student.leaveAdminLiteMode();}"><i class="ph-bold ph-arrow-left"></i> <span>Retour à mon compte</span></button>
       <button class="btn-ghost" onclick="App.auth.logout()"><i class="ph-bold ph-sign-out"></i> <span data-i18n="logout">Déconnexion</span></button>
     </div>
   </div>
@@ -256,7 +251,6 @@
   </div>
 </a>
 
-<!-- Scripts dans l'ordre -->
 <script src="js/config.js"></script>
 <script src="js/translations.js"></script>
 <script src="js/utils.js"></script>
