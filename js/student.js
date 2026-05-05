@@ -20,25 +20,6 @@ App.student.renderStudent = function(et) {
     extraMoyHtml += '<div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:'+pct+'%;"></div></div>';
     extraMoyHtml += getGradeBadge(moyNum);
   }
-
-  App.student.enterAdminMode = function() {
-  window._studentAdmin = true;
-  isAdmin = true;
-  isAdminLite = false;
-  App.showView("admin");
-  App.admin.loadAdmin();
-  document.getElementById("leaveAdminLiteBtn").style.display = "inline-flex";
-  document.getElementById("adminLiteBadge").classList.add("hidden");
-};
-
-App.student.leaveAdminModeStudent = function() {
-  window._studentAdmin = false;
-  isAdmin = false;
-  isAdminLite = false;
-  document.getElementById("leaveAdminLiteBtn").style.display = "none";
-  App.showView("student");
-  if (currentStudent) App.student.renderStudent(currentStudent);
-};
   document.getElementById("statMoyExtra").innerHTML = extraMoyHtml;
 
   var extraRankHtml = getRankBadge(et.classement);
@@ -101,6 +82,14 @@ App.student.leaveAdminModeStudent = function() {
     btnAdminLite.style.display = "none";
   }
 
+  // Bouton Admin complet pour étudiant promu
+  var btnAdminFull = document.getElementById("btnAdminFullAccess");
+  if (et.role === 'admin') {
+    btnAdminFull.style.display = "inline-flex";
+  } else {
+    btnAdminFull.style.display = "none";
+  }
+
   App.student.initPeerComparison(et);
 };
 
@@ -124,39 +113,26 @@ App.student.leaveAdminLiteMode = function() {
   if (currentStudent) App.student.renderStudent(currentStudent);
 };
 
-var btnAdminFull = document.getElementById("btnAdminFullAccess");
-if (et.role === 'admin') {
-    btnAdminFull.style.display = "inline-flex";
-} else {
-    btnAdminFull.style.display = "none";
-};
-
+// ------ Admin complet étudiant ------
 App.student.enterAdminMode = function() {
-    window._studentAdmin = true;   // pour le bouton retour
-    isAdmin = true;
-    isAdminLite = false;
-    App.showView("admin");
-    App.admin.loadAdmin();
-    document.getElementById("leaveAdminLiteBtn").style.display = "inline-flex";
-    document.getElementById("adminLiteBadge").classList.add("hidden");
+  if (!currentStudent) return;
+  window._studentAdmin = true;
+  isAdmin = true;
+  isAdminLite = false;
+  App.showView("admin");
+  App.admin.loadAdmin();
+  document.getElementById("leaveAdminLiteBtn").style.display = "inline-flex";
+  document.getElementById("adminLiteBadge").classList.add("hidden");
 };
 
 App.student.leaveAdminModeStudent = function() {
-    window._studentAdmin = false;
-    isAdmin = false;
-    isAdminLite = false;
-    document.getElementById("leaveAdminLiteBtn").style.display = "none";
-    App.showView("student");
-    if (currentStudent) App.student.renderStudent(currentStudent);
+  window._studentAdmin = false;
+  isAdmin = false;
+  isAdminLite = false;
+  document.getElementById("leaveAdminLiteBtn").style.display = "none";
+  App.showView("student");
+  if (currentStudent) App.student.renderStudent(currentStudent);
 };
-
-// ... (le code existant du bouton Admin Lite)
-var btnAdminFull = document.getElementById("btnAdminFullAccess");
-if (et.role === 'admin') {
-    btnAdminFull.style.display = "inline-flex";
-} else {
-    btnAdminFull.style.display = "none";
-}
 
 App.student.showAccount = function() {
   if (!currentStudent) return;
@@ -219,6 +195,7 @@ App.student.envoyerSignalement = function() {
   });
 };
 
+// ----- PEER COMPARISON -----
 App.student.loadAllStudentsCache = function() {
   if (window._allStudentsCache) return Promise.resolve(window._allStudentsCache);
   return fetch(SUPABASE_URL+"/rest/v1/etudiants?select=numero,nom,prenom&limit=1000", {headers:SB_HEADERS})
