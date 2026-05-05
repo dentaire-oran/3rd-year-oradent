@@ -326,7 +326,7 @@ App.admin.renderComptes = function (data) {
   }
   var html = '';
 
-  // SECTION SUPER-ADMINS EN HAUT
+  // --- SECTION SUPER-ADMINS EN HAUT ---
   if (!isAdminLite) {
     html += '<div class="glass rounded-3xl p-6 mb-6">';
     html += '<h3 class="font-bold text-lg mb-4 flex items-center gap-2"><i class="ph-bold ph-shield-check"></i> ' + t("editSuperAdmin") + '</h3>';
@@ -346,7 +346,7 @@ App.admin.renderComptes = function (data) {
     html += '</div>';
   }
 
-  // TABLEAU DES COMPTES ÉTUDIANTS
+  // --- TABLEAU DES COMPTES ÉTUDIANTS ---
   html += '<div class="glass rounded-3xl overflow-hidden"><div style="overflow-x:auto;"><table class="res-table"><thead><tr>' +
     "<th>" + t("number") + "</th><th>" + t("lastName") + "</th><th>" + t("firstName") + "</th>" +
     "<th>" + t("customIdentifier") + "</th><th>" + t("customPassword") + "</th><th>" + t("actions") + "</th>" +
@@ -435,6 +435,7 @@ App.admin.resetCompte = function (num) {
     .catch(function () { showToast(t("saveError"), "danger"); });
 };
 
+// ******** SAUVEGARDE DES SUPER-ADMINS (correction réponse vide) ********
 App.admin.saveSuperAdmins = async function () {
   var currentPass = document.getElementById("currentAdminPass").value.trim();
   var newAdminId = document.getElementById("superAdminId").value.trim();
@@ -478,18 +479,30 @@ App.admin.saveSuperAdmins = async function () {
   localStorage.setItem("admin_lite_id_v2", ADMIN_LITE_ID);
   localStorage.setItem("admin_lite_hash_v2", ADMIN_LITE_MDP_HASH);
 
-  var upsert = function (role, username, hash) {
-    return fetch(SUPABASE_URL + "/rest/v1/admin_accounts", {
+  var upsert = async function (role, username, hash) {
+    var response = await fetch(SUPABASE_URL + "/rest/v1/admin_accounts", {
       method: "POST",
       headers: {
         ...SB_HEADERS,
         Prefer: "resolution=merge-duplicates"
       },
       body: JSON.stringify({ role: role, username: username, password_hash: hash })
-    }).then(function (r) {
-      if (!r.ok) throw new Error("HTTP " + r.status + " " + r.statusText);
-      return r.json();
     });
+
+    if (!response.ok) {
+      var errorText = "";
+      try {
+        var errorJson = await response.json();
+        errorText = errorJson.message || JSON.stringify(errorJson);
+      } catch (e) {
+        errorText = await response.text();
+      }
+      throw new Error("Erreur " + response.status + " : " + errorText);
+    }
+
+    // La réponse peut être vide (204 No Content) ou contenir un JSON
+    var text = await response.text();
+    return text ? JSON.parse(text) : null;
   };
 
   try {
@@ -499,7 +512,7 @@ App.admin.saveSuperAdmins = async function () {
     App.admin.loadComptes();
   } catch (err) {
     console.error("Upsert Supabase error:", err);
-    showToast("Erreur lors de l'enregistrement dans Supabase : " + err.message + ". Modifications enregistrées localement seulement.", "warning");
+    showToast("Erreur Supabase : " + err.message, "danger");
   }
 };
 
