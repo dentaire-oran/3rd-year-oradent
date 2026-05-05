@@ -1,0 +1,21 @@
+{
+  "name": "Dental Guide - Résultats 3ème Année",
+  "short_name": "Dental Guide",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#1e1b4b",
+  "theme_color": "#6366f1",
+  "description": "Consultez vos résultats de 3ème année — Dental Guide Oran",
+  "icons": [
+    {
+      "src": "https://via.placeholder.com/192x192.png?text=DG",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://via.placeholder.com/512x512.png?text=DG",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
