@@ -82,13 +82,16 @@ App.student.renderStudent = function(et) {
     btnAdminLite.style.display = "none";
   }
 
-  // Bouton Admin complet pour étudiant promu
   var btnAdminFull = document.getElementById("btnAdminFullAccess");
   if (et.role === 'admin') {
     btnAdminFull.style.display = "inline-flex";
   } else {
     btnAdminFull.style.display = "none";
   }
+
+  // Afficher le bouton simulateur pour tous les étudiants
+  var btnSimuler = document.getElementById("btnSimulerMoyenne");
+  if (btnSimuler) btnSimuler.style.display = "inline-flex";
 
   App.student.initPeerComparison(et);
 };
@@ -113,7 +116,6 @@ App.student.leaveAdminLiteMode = function() {
   if (currentStudent) App.student.renderStudent(currentStudent);
 };
 
-// ------ Admin complet étudiant ------
 App.student.enterAdminMode = function() {
   if (!currentStudent) return;
   window._studentAdmin = true;
@@ -462,5 +464,96 @@ App.student.updateToggleButton = function(parentId) {
   var btn = document.getElementById("btn_toggle_"+parentId);
   if (btn) {
     btn.textContent = allExpanded ? t("detailCollapseAll") : t("detailExpandAll");
+  }
+};
+
+// ----- SIMULATEUR DE MOYENNE -----
+App.student.openSimulator = function() {
+  if (!currentStudent) return;
+
+  var d = document.createElement("div");
+  d.className = "modal-overlay";
+  var inner = document.createElement("div");
+  inner.className = "modal-box";
+
+  var hdr = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;">' +
+    '<div style="font-weight:800;font-size:1.1rem;">Simuler ma moyenne</div>' +
+    '<button class="btn-ghost" style="padding:0.4rem 0.8rem;" onclick="this.closest(\'.modal-overlay\').remove()"><i class="ph-bold ph-x"></i></button>' +
+    '</div>';
+
+  var table = '<div style="overflow-x:auto;"><table class="res-table" id="simulTable"><thead><tr>' +
+    '<th>Module</th><th>Coef</th><th>EMD 1</th><th>EMD 2</th><th>TD</th><th>TP</th><th style="color:#818cf8;">Moyenne module</th>' +
+    '</tr></thead><tbody>';
+
+  var orig = currentStudent;
+  MODULES.forEach(function(mod) {
+    var k = mod.key;
+    var emd1 = orig[k+"_emd1"] !== null && orig[k+"_emd1"] !== undefined ? orig[k+"_emd1"] : "";
+    var emd2 = orig[k+"_emd2"] !== null && orig[k+"_emd2"] !== undefined ? orig[k+"_emd2"] : "";
+    var td   = orig[k+"_td"]   !== null && orig[k+"_td"]   !== undefined ? orig[k+"_td"]   : "";
+    var tp   = orig[k+"_tp"]   !== null && orig[k+"_tp"]   !== undefined ? orig[k+"_tp"]   : "";
+
+    table += '<tr>' +
+      '<td style="font-weight:600;">' + mod.nom + '<span class="coef-badge">x' + mod.coef + '</span></td>' +
+      '<td class="mono">' + mod.coef + '</td>' +
+      '<td><input type="text" class="calc-input" value="' + emd1 + '" placeholder="—" oninput="App.student.recalcSimul()" style="padding:0.3rem;width:70px;" data-mod="' + k + '" data-field="emd1"></td>' +
+      '<td><input type="text" class="calc-input" value="' + emd2 + '" placeholder="—" oninput="App.student.recalcSimul()" style="padding:0.3rem;width:70px;" data-mod="' + k + '" data-field="emd2"></td>' +
+      '<td><input type="text" class="calc-input" value="' + td   + '" placeholder="—" oninput="App.student.recalcSimul()" style="padding:0.3rem;width:70px;" data-mod="' + k + '" data-field="td"></td>' +
+      '<td><input type="text" class="calc-input" value="' + tp   + '" placeholder="—" oninput="App.student.recalcSimul()" style="padding:0.3rem;width:70px;" data-mod="' + k + '" data-field="tp"></td>' +
+      '<td class="mono" id="sim_moy_' + k + '" style="font-weight:700;color:#818cf8;">—</td>' +
+      '</tr>';
+  });
+
+  table += '</tbody></table></div>';
+
+  var footer = '<div style="margin-top:1.5rem;text-align:right;font-size:1.2rem;font-weight:800;">' +
+    'Moyenne générale simulée : <span id="sim_moy_gen" style="color:#818cf8;">—</span></div>';
+
+  inner.innerHTML = hdr + table + footer;
+  d.appendChild(inner);
+  document.body.appendChild(d);
+
+  App.student.recalcSimul();
+};
+
+App.student.recalcSimul = function() {
+  var totalPts = 0;
+  var totalDiv = 0;
+
+  MODULES.forEach(function(mod) {
+    var k = mod.key;
+
+    var getVal = function(field) {
+      var inp = document.querySelector('#simulTable input[data-mod="' + k + '"][data-field="' + field + '"]');
+      if (!inp) return null;
+      var v = inp.value.trim();
+      if (v === "" || v === "Abs") return null;
+      var n = parseFloat(v.replace(",", "."));
+      return isNaN(n) ? null : n;
+    };
+
+    var emd1 = getVal("emd1");
+    var emd2 = getVal("emd2");
+    var td   = getVal("td");
+    var tp   = getVal("tp");
+
+    var moyModule = calcMoyModule(emd1, emd2, td, tp);
+    var moySpan = document.getElementById("sim_moy_" + k);
+    if (moySpan) {
+      moySpan.textContent = moyModule !== null ? moyModule.toFixed(2) : "—";
+      moySpan.style.color = moyModule === null ? "var(--text-muted)" : moyModule < 5 ? "var(--danger)" : moyModule < 10 ? "var(--warning)" : "var(--success)";
+    }
+
+    if (moyModule !== null) {
+      totalPts += moyModule * mod.coef;
+      totalDiv += mod.coef;
+    }
+  });
+
+  var moyGen = totalDiv > 0 ? (totalPts / totalDiv) : null;
+  var moyGenEl = document.getElementById("sim_moy_gen");
+  if (moyGenEl) {
+    moyGenEl.textContent = moyGen !== null ? moyGen.toFixed(3) : "—";
+    moyGenEl.style.color = moyGen === null ? "var(--text-muted)" : moyGen < 10 ? "var(--danger)" : "var(--success)";
   }
 };
