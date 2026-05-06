@@ -401,8 +401,8 @@ App.admin.renderNotifs = function (notifs) {
   });
 };
 
-App.admin.deleteNotification = function (id) {
-  if (!confirm('Supprimer cette notification ?')) return;
+App.admin.deleteNotification = async function (id) {
+  if (!(await showConfirm('Supprimer cette notification ?'))) return;
   fetch(SUPABASE_URL + '/rest/v1/notifications?id=eq.' + id, {
     method: 'DELETE',
     headers: SB_HEADERS
@@ -433,12 +433,12 @@ App.admin.toggleDeleteAllBtn = function() {
   }
 };
 
-App.admin.deleteFilteredNotifs = function() {
+App.admin.deleteFilteredNotifs = async function() {
   var filter = App.admin.notifFilter;
   if (!filter || filter === 'all') return;
   
   var confirmMsg = 'Supprimer définitivement toutes les notifications de cette catégorie ?';
-  if (!confirm(confirmMsg)) return;
+  if (!(await showConfirm(confirmMsg))) return;
 
   var condition = '';
   if (filter === 'erreur') condition = "type=in.(Erreur de note,Note manquante,Autre)";
@@ -612,8 +612,8 @@ App.admin.saveStudentAccount = function (num) {
     .catch(function () { showToast(t("saveError"), "danger"); });
 };
 
-App.admin.resetCompte = function (num) {
-  if (!confirm(t("resetAccount") + num + t("confirmReset"))) return;
+App.admin.resetCompte = async function (num) {
+  if (!(await showConfirm(t("resetAccount") + num + t("confirmReset")))) return;
   fsPatch("etudiants", String(num), { custom_id: null, custom_mdp: null })
     .then(function () {
       showToast(t("accountReset") + num, "success");
@@ -1178,7 +1178,7 @@ App.admin.renderModuleRanking = function () {
 };
 
 App.admin.recalculerTout = async function () {
-  if (!confirm("Recalculer toutes les moyennes et classements ? Cela peut prendre quelques secondes.")) return;
+  if (!(await showConfirm("Recalculer toutes les moyennes et classements ? Cela peut prendre quelques secondes."))) return;
 
   var btn = document.getElementById("btnRecalculer");
   btn.disabled = true;
