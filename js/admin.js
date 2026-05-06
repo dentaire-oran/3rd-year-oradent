@@ -346,6 +346,52 @@ App.admin.deleteNotification = function (id) {
     });
 };
 
+App.admin.toggleDeleteAllBtn = function() {
+  var btn = document.getElementById('deleteAllFilteredBtn');
+  if (!btn) return;
+  if (App.admin.notifFilter && App.admin.notifFilter !== 'all') {
+    btn.classList.remove('hidden');
+    var label = 'Supprimer les notifications de cette section';
+    if (App.admin.notifFilter === 'erreur') label = 'Supprimer toutes les erreurs';
+    else if (App.admin.notifFilter === 'suggestion') label = 'Supprimer toutes les suggestions';
+    else if (App.admin.notifFilter === 'connexion') label = 'Supprimer toutes les connexions';
+    else if (App.admin.notifFilter === 'compte') label = 'Supprimer toutes les modifications de compte';
+    btn.innerHTML = '<i class="ph-bold ph-trash"></i> ' + label;
+  } else {
+    btn.classList.add('hidden');
+  }
+};
+
+App.admin.deleteFilteredNotifs = function() {
+  var filter = App.admin.notifFilter;
+  if (!filter || filter === 'all') return;
+  
+  var confirmMsg = 'Supprimer définitivement toutes les notifications de cette catégorie ?';
+  if (!confirm(confirmMsg)) return;
+
+  var condition = '';
+  if (filter === 'erreur') condition = "type=in.(Erreur de note,Note manquante,Autre)";
+  else if (filter === 'suggestion') condition = "type=in.(Suggestion)";
+  else if (filter === 'connexion') condition = "type=in.(Connexion,Connection,اتصال)";
+  else if (filter === 'compte') condition = "type=in.(Modification de compte,Account modification,تعديل الحساب)";
+
+  fetch(SUPABASE_URL + '/rest/v1/notifications?' + condition, {
+    method: 'DELETE',
+    headers: SB_HEADERS
+  })
+  .then(function(r) {
+    if (r.ok) {
+      showToast('Notifications supprimées', 'success');
+      App.admin.loadNotifs();
+    } else {
+      showToast('Erreur suppression', 'danger');
+    }
+  })
+  .catch(function() {
+    showToast('Erreur réseau', 'danger');
+  });
+};
+
 document.addEventListener('click', function(e) {
   if (e.target.closest('.filter-notif')) {
     var btn = e.target.closest('.filter-notif');
@@ -354,6 +400,7 @@ document.addEventListener('click', function(e) {
     btn.classList.add('active');
     App.admin.notifFilter = filter;
     App.admin.loadNotifs();
+    App.admin.toggleDeleteAllBtn();
   }
 });
 
