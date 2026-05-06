@@ -1,74 +1,115 @@
 function getDeviceType() {
   var ua = navigator.userAgent;
-  if (/iPad/i.test(ua) || (/Macintosh/i.test(ua) && (navigator.maxTouchPoints || 0) > 1)) return "tablet";
-  if (/Mobi|Android|iPhone|iPod|BlackBerry|IEMobile|Opera Mini|webOS|Windows Phone/i.test(ua)) return "mobile";
-  return "pc";
+  if (/iPad/i.test(ua) || (/Macintosh/i.test(ua) && navigator.maxTouchPoints > 1)) return "Tablette";
+  if (/Mobi|Android|iPhone|iPod|BlackBerry|IEMobile|Opera Mini|webOS|Windows Phone/i.test(ua)) return "Mobile";
+  return "PC";
 }
 
 function getDeviceModel() {
   var ua = navigator.userAgent;
   if (/iPhone/i.test(ua)) {
-    var w = window.screen.width, h = window.screen.height, dpr = window.devicePixelRatio || 1;
-    if ((w===430&&h===932)||(w===932&&h===430)) return "iPhone 16/15/14 Pro Max";
-    if ((w===393&&h===852)||(w===852&&h===393)) return "iPhone 16/15/14 Pro";
-    if ((w===390&&h===844)||(w===844&&h===390)) return "iPhone 14/15/16/13 Pro";
-    if ((w===375&&h===812)||(w===812&&h===375)) return "iPhone 11 Pro/XS";
-    if ((w===375&&h===667)||(w===667&&h===375)) return "iPhone SE/8/7";
+    var w = screen.width, h = screen.height;
+    if ((w===430&&h===932)||(w===932&&h===430)) return "iPhone 14/15/16 Pro Max";
+    if ((w===393&&h===852)||(w===852&&h===393)) return "iPhone 14/15/16 Pro";
+    if ((w===390&&h===844)||(w===844&&h===390)) return "iPhone 12/13 Pro";
+    if ((w===375&&h===812)||(w===812&&h===375)) return "iPhone X/XS/11 Pro";
+    if ((w===375&&h===667)||(w===667&&h===375)) return "iPhone SE/6/7/8";
     return "iPhone";
   }
+  if (/iPad/i.test(ua)) return "iPad";
   if (/Android/i.test(ua)) {
-    var patterns = [
-      {p:/SM-S938|S25 Ultra/i,n:"Samsung Galaxy S25 Ultra"},{p:/SM-S931/i,n:"Samsung Galaxy S25"},
-      {p:/SM-S928|S24 Ultra/i,n:"Samsung Galaxy S24 Ultra"},{p:/SM-S921/i,n:"Samsung Galaxy S24"},
-      {p:/SM-S918|S23 Ultra/i,n:"Samsung Galaxy S23 Ultra"},{p:/SM-S911/i,n:"Samsung Galaxy S23"},
-      {p:/SM-F956|Z Fold6/i,n:"Samsung Z Fold 6"},{p:/SM-F741|Z Flip6/i,n:"Samsung Z Flip 6"},
-      {p:/SM-A556|A55/i,n:"Samsung Galaxy A55"},{p:/SM-A546|A54/i,n:"Samsung Galaxy A54"},
-    ];
-    for (var i=0;i<patterns.length;i++) if (patterns[i].p.test(ua)) return patterns[i].n;
-    var gs = ua.match(/SM-([A-Z][0-9]{3,4}[A-Z]?)/i);
-    if (gs) return "Samsung Galaxy (SM-"+gs[1]+")";
-    if (/Pixel/i.test(ua)) { var pm=ua.match(/Pixel\s?([0-9]+[a-zA-Z\s]*)/i); return pm?"Google Pixel "+pm[1].trim():"Google Pixel"; }
-    var ad = ua.match(/Android\s[0-9.]+;\s?([^;)]+?)\s?(?:Build|;|\))/i);
-    if (ad&&ad[1]&&ad[1].length>2&&ad[1].length<40) return ad[1].trim();
+    var match = ua.match(/SM-[A-Za-z0-9]+/);
+    if (match) return "Samsung " + match[0];
+    match = ua.match(/Pixel\s?[0-9A-Za-z]*/);
+    if (match) return "Google " + match[0];
+    match = ua.match(/(?:OnePlus|OPPO|Xiaomi|Redmi|HUAWEI|realme|motorola|Moto\s?[A-Za-z]+)[\s-]?[A-Za-z0-9]+/);
+    if (match) return match[0];
+    match = ua.match(/Android\s[0-9.]+\s;\s(.+?)\s?(?:Build|;|\))/);
+    if (match && match[1].length > 2) return match[1].trim();
     return "Android Device";
   }
-  if (/Windows NT/i.test(ua)) return "Windows PC";
+  if (/Windows NT/i.test(ua)) return "PC Windows";
   if (/Macintosh/i.test(ua)) return "Mac";
-  if (/Linux/i.test(ua)) return "Linux PC";
-  return "Unknown Device";
+  return "Appareil inconnu";
 }
 
 function getBrowserInfo() {
   var ua = navigator.userAgent;
-  if (/Edg\//i.test(ua)) { var v=ua.match(/Edg\/([0-9]+)/); return "Edge "+(v?v[1]:""); }
-  if (/Chrome\//i.test(ua)&&!/Edg/i.test(ua)) { var v=ua.match(/Chrome\/([0-9]+)/); return "Chrome "+(v?v[1]:""); }
-  if (/Firefox/i.test(ua)) { var v=ua.match(/Firefox\/([0-9]+)/); return "Firefox "+(v?v[1]:""); }
-  if (/Safari/i.test(ua)&&!/Chrome/i.test(ua)) { var v=ua.match(/Version\/([0-9]+)/); return "Safari "+(v?v[1]:""); }
-  if (/SamsungBrowser/i.test(ua)) { var v=ua.match(/SamsungBrowser\/([0-9]+)/); return "Samsung Internet "+(v?v[1]:""); }
+  var res = "";
+  if (/Edg\//i.test(ua)) {
+    res = "Edge";
+    var v = ua.match(/Edg\/([0-9]+)/);
+    if (v) res += " " + v[1];
+    return res;
+  }
+  if (/Chrome\//i.test(ua) && !/Edg\//i.test(ua)) {
+    res = "Chrome";
+    var v = ua.match(/Chrome\/([0-9]+)/);
+    if (v) res += " " + v[1];
+    return res;
+  }
+  if (/Firefox\//i.test(ua)) {
+    res = "Firefox";
+    var v = ua.match(/Firefox\/([0-9]+)/);
+    if (v) res += " " + v[1];
+    return res;
+  }
+  if (/Safari/i.test(ua) && !/Chrome/i.test(ua)) {
+    res = "Safari";
+    var v = ua.match(/Version\/([0-9]+)/);
+    if (v) res += " " + v[1];
+    return res;
+  }
+  if (/SamsungBrowser/i.test(ua)) {
+    res = "Samsung Internet";
+    var v = ua.match(/SamsungBrowser\/([0-9]+)/);
+    if (v) res += " " + v[1];
+    return res;
+  }
   return "Browser";
 }
 
 function getOSInfo() {
   var ua = navigator.userAgent;
-  var iOS = ua.match(/iPhone OS ([0-9_]+)|iPad.*OS ([0-9_]+)/i);
-  if (iOS) return "iOS "+(iOS[1]||iOS[2]).replace(/_/g,".");
-  var android = ua.match(/Android ([0-9.]+)/);
-  if (android) return "Android "+android[1];
-  var windows = ua.match(/Windows NT ([0-9.]+)/);
-  if (windows) return "Windows "+( {"10.0":"10/11","6.3":"8.1","6.1":"7"}[windows[1]]||windows[1] );
-  var macOS = ua.match(/Mac OS X ([0-9_]+)/);
-  if (macOS) return "macOS "+macOS[1].replace(/_/g,".");
-  return "Unknown OS";
+  if (/iPhone|iPad/.test(ua)) {
+    var ios = ua.match(/OS (\d+_\d+)/);
+    if (ios) return "iOS " + ios[1].replace(/_/g, ".");
+    return "iOS";
+  }
+  if (/Android/i.test(ua)) {
+    var android = ua.match(/Android\s([0-9.]+)/);
+    if (android) return "Android " + android[1];
+    return "Android";
+  }
+  if (/Windows NT/i.test(ua)) {
+    var win = ua.match(/Windows NT\s([0-9.]+)/);
+    if (win) {
+      var ver = win[1];
+      var map = {"10.0":"10/11","6.3":"8.1","6.2":"8","6.1":"7"};
+      return "Windows " + (map[ver]||ver);
+    }
+    return "Windows";
+  }
+  if (/Macintosh/i.test(ua)) {
+    var mac = ua.match(/Mac OS X\s([0-9_.]+)/);
+    if (mac) return "macOS " + mac[1].replace(/_/g, ".");
+    return "macOS";
+  }
+  return "OS inconnu";
+}
+
+function getDeviceFullDescription() {
+  return getDeviceType() + " | " + getDeviceModel() + " | " + getBrowserInfo() + " | " + getOSInfo();
 }
 
 function getDeviceDisplayString() {
-  var t2 = getDeviceType(), m = getDeviceModel(), b = getBrowserInfo(), o = getOSInfo();
-  var icon = t2==="mobile"?"📱":t2==="tablet"?"📲":"💻";
-  return icon+" "+m+" ("+o+", "+b+")";
+  var t = getDeviceType(), m = getDeviceModel(), b = getBrowserInfo(), o = getOSInfo();
+  var icone = t==="Mobile"?"📱":t==="Tablette"?"📲":"💻";
+  return icone + " " + m + " (" + o + ", " + b + ")";
 }
 
 function getDeviceShortString() {
-  return getDeviceType()+": "+getDeviceModel();
+  return getDeviceType() + ": " + getDeviceModel();
 }
 
 async function sha256(msg) {
