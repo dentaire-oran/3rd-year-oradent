@@ -149,17 +149,17 @@ function getPeerAccessInfo(et) {
 
 window.showToast = function (msg, type) {
   type = type || "info";
-  var colors = {
-    success: "var(--success)",
-    danger: "var(--danger)",
-    warning: "var(--warning)",
-    info: "#a5b4fc"
-  };
   var icons = {
     success: "ph-check-circle",
     danger: "ph-x-circle",
     warning: "ph-warning",
     info: "ph-info"
+  };
+  var colors = {
+    success: "var(--success)",
+    danger: "var(--danger)",
+    warning: "var(--warning)",
+    info: "#a5b4fc"
   };
 
   var container = document.getElementById("toastContainer");
@@ -170,7 +170,7 @@ window.showToast = function (msg, type) {
   }
 
   var toast = document.createElement("div");
-  toast.className = "toast-item glass " + type;
+  toast.className = "toast-item " + type;
   toast.innerHTML =
     '<i class="ph-fill ' +
     icons[type] +
@@ -180,18 +180,15 @@ window.showToast = function (msg, type) {
     msg;
 
   container.appendChild(toast);
-  requestAnimationFrame(function () {
-    toast.classList.add("show");
-  });
 
+  // Suppression après 4s avec animation de sortie
   setTimeout(function () {
-    toast.classList.remove("show");
+    toast.classList.add("hide");
     setTimeout(function () {
-      toast.remove();
-    }, 400);
+      if (toast.parentNode) toast.remove();
+    }, 400);   // correspond à la durée de toastOut
   }, 4000);
 };
-
 window.showConfirm = function (message) {
   return new Promise(function (resolve) {
     var modal = document.getElementById("confirmModal");
