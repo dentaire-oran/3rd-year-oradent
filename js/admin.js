@@ -1014,7 +1014,6 @@ App.admin.recalculerTout = async function () {
   btn.disabled = true;
   btn.innerHTML = '<div class="spinner"></div> Calcul en cours...';
 
-  // valeurs codées en dur (identiques à celles de ton projet)
   var url = "https://wjhugpnjapsyysgsxrtp.supabase.co";
   var key = "sb_publishable_zOYqcJMGGvqSFeR5kHT5lg_3xHXoP7s";
 
@@ -1027,14 +1026,17 @@ App.admin.recalculerTout = async function () {
         "Content-Type": "application/json"
       }
     });
+
     if (res.ok) {
       showToast("Moyennes et classement recalculés avec succès !", "success");
       App.admin.loadAdmin();
     } else {
-      showToast("Erreur lors du recalcul", "danger");
+      // Récupérer le message d’erreur du serveur
+      var errText = await res.text();
+      showToast("Erreur " + res.status + " : " + errText.slice(0, 100), "danger");
     }
   } catch (e) {
-    showToast("Erreur de connexion", "danger");
+    showToast("Erreur réseau : " + e.message, "danger");
   } finally {
     btn.disabled = false;
     btn.innerHTML = "🔄 Recalculer toutes les moyennes";
