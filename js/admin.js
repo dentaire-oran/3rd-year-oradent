@@ -395,10 +395,19 @@ App.admin.renderNotifs = function (notifs) {
       "</div>" +
       '<div style="display:flex;align-items:center;gap:0.5rem;">' +
         '<div style="font-size:0.75rem;color:var(--text-muted);white-space:nowrap;">' + n.date + '</div>' +
+        '<button class="btn-sm btn-ghost-sm" style="padding:0.25rem 0.5rem;" onclick="App.admin.showDeviceInfo(\'' + (n.device_full || n.device_info || "Aucune info") + '\')"><i class="ph-bold ph-info"></i></button>' +
         '<button class="btn-sm btn-danger-sm" style="padding:0.25rem 0.5rem;" onclick="App.admin.deleteNotification(' + n.id + ')"><i class="ph-bold ph-trash"></i></button>' +
       '</div></div>';
     el.appendChild(div);
   });
+};
+
+App.admin.showDeviceInfo = function (fullDescription) {
+  var modal = document.getElementById("deviceInfoModal");
+  var content = document.getElementById("deviceInfoContent");
+  if (!modal || !content) return;
+  content.innerHTML = fullDescription.replace(/\|/g, "<br>");
+  modal.classList.remove("hidden");
 };
 
 App.admin.deleteNotification = async function (id) {
