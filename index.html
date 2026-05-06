@@ -20,7 +20,6 @@
 </head>
 <body>
 
-<!-- SIDEBAR -->
 <div id="sidebar" class="fixed inset-y-0 z-50 w-80 glass transition-transform duration-500 ease-out flex flex-col" style="background:var(--sidebar-bg);">
   <div class="p-8 pt-24 flex flex-col h-full overflow-y-auto">
     <h2 class="text-3xl font-bold text-gradient mb-10">Dental Guide</h2>
@@ -47,7 +46,6 @@
 <div id="breadcrumb" class="fixed top-8 z-40 left-1/2 -translate-x-1/2 flex items-center gap-1 glass rounded-full" style="max-width:90vw;display:none;"></div>
 <div id="toastContainer"></div>
 
-<!-- LOGIN -->
 <div id="viewLogin" class="pt-28 pb-32 px-6 max-w-lg mx-auto flex flex-col items-center justify-center min-h-screen">
   <h1 class="text-5xl font-bold text-gradient animate-float mb-4 text-center" data-i18n="results">Résultats</h1>
   <p class="text-xl mb-10 font-light text-center" style="color:var(--text-muted);" data-i18n="year3Subtitle">3ème Année — Dental Guide Oran</p>
@@ -71,7 +69,6 @@
   </div>
 </div>
 
-<!-- STUDENT -->
 <div id="viewStudent" class="hidden pt-28 pb-32 px-6 max-w-5xl mx-auto">
   <div class="glass rounded-3xl p-6 mb-6">
     <div class="flex items-start justify-between flex-wrap gap-4">
@@ -90,7 +87,6 @@
         <button class="btn-ghost" id="btnAdminFullAccess" style="display:none;" onclick="App.student.enterAdminMode()">
           <i class="ph-bold ph-shield-check"></i> <span>Admin</span>
         </button>
-        <!-- Bouton Simuler ma moyenne (visible pour tous les étudiants) -->
         <button class="btn-ghost" id="btnSimulerMoyenne" style="display:none;" onclick="App.student.openSimulator()">
           <i class="ph-bold ph-calculator"></i> <span>Simuler ma moyenne</span>
         </button>
@@ -162,7 +158,6 @@
   </div>
 </div>
 
-<!-- ACCOUNT -->
 <div id="viewAccount" class="hidden pt-28 pb-32 px-6 max-w-lg mx-auto">
   <button class="flex items-center gap-2 mb-6 font-semibold" style="color:var(--text-muted);background:none;border:none;cursor:pointer;" onclick="App.showView('student')">
     <i class="ph-bold ph-arrow-left"></i> <span data-i18n="back">Retour</span>
@@ -184,7 +179,6 @@
   </div>
 </div>
 
-<!-- ADMIN -->
 <div id="viewAdmin" class="hidden pt-28 pb-32 px-6 max-w-6xl mx-auto">
   <div class="flex items-center justify-between flex-wrap gap-4 mb-6">
     <div>
@@ -227,20 +221,18 @@
     </div></div>
   </div>
   <div id="panelNotifs" class="hidden">
-  <div style="display:flex; flex-wrap:wrap; gap:0.5rem; margin-bottom:1rem;">
-    <button class="btn-sm btn-ghost-sm filter-notif active" data-filter="all">Toutes</button>
-    <button class="btn-sm btn-ghost-sm filter-notif" data-filter="erreur">Erreurs</button>
-    <button class="btn-sm btn-ghost-sm filter-notif" data-filter="suggestion">Suggestions</button>
-    <button class="btn-sm btn-ghost-sm filter-notif" data-filter="connexion">Connexions</button>
-    <button class="btn-sm btn-ghost-sm filter-notif" data-filter="compte">Comptes</button>
+    <div style="display:flex; flex-wrap:wrap; gap:0.5rem; margin-bottom:1rem;">
+      <button class="btn-sm btn-ghost-sm filter-notif active" data-filter="all">Toutes</button>
+      <button class="btn-sm btn-ghost-sm filter-notif" data-filter="erreur">Erreurs</button>
+      <button class="btn-sm btn-ghost-sm filter-notif" data-filter="suggestion">Suggestions</button>
+      <button class="btn-sm btn-ghost-sm filter-notif" data-filter="connexion">Connexions</button>
+      <button class="btn-sm btn-ghost-sm filter-notif" data-filter="compte">Comptes</button>
+    </div>
+    <button id="deleteAllFilteredBtn" class="btn-ghost hidden" onclick="App.admin.deleteFilteredNotifs()" style="margin-bottom:1rem;">
+      <i class="ph-bold ph-trash"></i> Supprimer les notifications de cette section
+    </button>
+    <div id="notifsList"><p class="text-center py-8" style="color:var(--text-muted);">Chargement...</p></div>
   </div>
-  <button id="deleteAllFilteredBtn" class="btn-ghost hidden" onclick="App.admin.deleteFilteredNotifs()" style="margin-bottom:1rem;">
-    <i class="ph-bold ph-trash"></i> Supprimer les notifications de cette section
-  </button>
-  <div id="notifsList"><p class="text-center py-8" style="color:var(--text-muted);">Chargement...</p></div>
-</div>
-  <div id="notifsList"><p class="text-center py-8" style="color:var(--text-muted);">Chargement...</p></div>
-</div>
   <div id="panelComptes" class="hidden"><div id="comptesList"><p class="text-center py-8" style="color:var(--text-muted);" data-i18n="loading">Chargement...</p></div></div>
   <div id="panelClassement" class="hidden">
     <div class="glass rounded-3xl p-6 mb-4">
