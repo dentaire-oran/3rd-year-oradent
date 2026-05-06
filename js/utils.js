@@ -146,3 +146,48 @@ function getPeerAccessInfo(et) {
   } catch(e) {}
   return { label: t("accessNone"), html: '<span style="color:var(--text-muted);font-size:0.82rem;">—</span>', count: 0 };
 }
+
+window.showToast = function (msg, type) {
+  type = type || "info";
+  var colors = {
+    success: "var(--success)",
+    danger: "var(--danger)",
+    warning: "var(--warning)",
+    info: "#a5b4fc"
+  };
+  var icons = {
+    success: "ph-check-circle",
+    danger: "ph-x-circle",
+    warning: "ph-warning",
+    info: "ph-info"
+  };
+
+  var container = document.getElementById("toastContainer");
+  if (!container) {
+    container = document.createElement("div");
+    container.id = "toastContainer";
+    document.body.appendChild(container);
+  }
+
+  var toast = document.createElement("div");
+  toast.className = "toast-item glass " + type;
+  toast.innerHTML =
+    '<i class="ph-fill ' +
+    icons[type] +
+    '" style="color:' +
+    colors[type] +
+    ';"></i>' +
+    msg;
+
+  container.appendChild(toast);
+  requestAnimationFrame(function () {
+    toast.classList.add("show");
+  });
+
+  setTimeout(function () {
+    toast.classList.remove("show");
+    setTimeout(function () {
+      toast.remove();
+    }, 400);
+  }, 4000);
+};
