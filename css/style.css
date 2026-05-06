@@ -142,7 +142,7 @@ html[dir="rtl"] .nav-link:hover { transform:translateX(-4px); }
   gap: 0.75rem;
   pointer-events: auto;
   opacity: 0;
-  transform: translateX(100px);
+  transform: translateX(80px);
   transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
 }
 
