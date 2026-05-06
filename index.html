@@ -207,6 +207,9 @@
     <button class="tab" id="tabClassement" onclick="App.admin.switchTab('classement')"><i class="ph-bold ph-trophy"></i> <span data-i18n="moduleRanking">Classement</span></button>
   </div>
   <div id="panelEtudiants">
+    <button id="btnRecalculer" class="btn-main" onclick="App.admin.recalculerTout()" style="margin-bottom:1rem; width:auto; padding:0.6rem 1.5rem; max-width:300px;">
+      🔄 Recalculer toutes les moyennes
+    </button>
     <div class="glass rounded-3xl overflow-hidden"><div style="overflow-x:auto;">
       <table class="res-table">
         <thead><tr>
