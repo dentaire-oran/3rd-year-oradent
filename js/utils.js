@@ -81,7 +81,7 @@ function calcMoyModule(emd1, emd2, td, tp) {
   if (emd1!==null&&emd1!==undefined&&emd1!=="Abs") emdVals.push(parseFloat(emd1));
   if (emd2!==null&&emd2!==undefined&&emd2!=="Abs") emdVals.push(parseFloat(emd2));
   if (emdVals.length>0) { pts+=(emdVals.reduce(function(a,b){return a+b;},0)/emdVals.length)*1; div+=1; }
-  if (td!==null&&td!==undefined&&td!=="Abs") { pts+=parseFloat(td)*1; div+=1; }
+  if (td!==null&&td!==undefined&&td!=="Abs") { pts+=parseFloat(td)*2; div+=2; }
   if (tp!==null&&tp!==undefined&&tp!=="Abs") { pts+=parseFloat(tp)*2; div+=2; }
   if (div===0) return null;
   return Math.round((pts/div)*10000)/10000;
