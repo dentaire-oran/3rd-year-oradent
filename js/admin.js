@@ -1,66 +1,3 @@
-function getPeerAccessInfo(et) {
-  if (!et.peer_view) return { label: '—', html: '<span style="color:var(--text-muted);font-size:0.82rem;">—</span>', count: 0 };
-  if (et.peer_view === 'ALL') return { label: 'AL', html: '<span class="badge badge-al" style="font-size:0.7rem;padding:2px 8px;">⭐ AL</span>', count: -1 };
-  try {
-    var pv = JSON.parse(et.peer_view);
-    if (Array.isArray(pv) && pv.length > 0) {
-      var total = adminData.length || 444;
-      return {
-        label: pv.length + '/' + total,
-        html: '<span style="font-family:\'JetBrains Mono\',monospace;font-size:0.82rem;font-weight:700;color:#a5b4fc;">' + pv.length + '<span style="color:var(--text-muted);font-weight:400;">/' + total + '</span></span>',
-        count: pv.length
-      };
-    }
-  } catch(e) {}
-  return { label: '—', html: '<span style="color:var(--text-muted);font-size:0.82rem;">—</span>', count: 0 };
-}
-
-function fn(v) {
-  if (v === null || v === undefined) return '<span class="note-abs">—</span>';
-  if (v === 'Abs') return '<span class="note-abs">Abs</span>';
-  var n = parseFloat(v); if (isNaN(n)) return v;
-  return n.toFixed(2);
-}
-function nc(v) {
-  if (v === 'Abs' || v === null || v === undefined) return 'note-abs';
-  var n = parseFloat(v); if (isNaN(n)) return '';
-  return n < 5 ? 'note-bad' : n < 10 ? 'note-mid' : 'note-good';
-}
-function getGradeBadge(value) {
-  if (value === null || value === undefined || value === 'Abs') return '';
-  var n = parseFloat(value); if (isNaN(n)) return '';
-  if (n >= 14) return '<span class="badge badge-gold" style="padding:2px 6px;font-size:0.7rem;margin-left:6px;">Or</span>';
-  if (n >= 13) return '<span class="badge badge-silver" style="padding:2px 6px;font-size:0.7rem;margin-left:6px;">Argent</span>';
-  if (n >= 12) return '<span class="badge badge-bronze" style="padding:2px 6px;font-size:0.7rem;margin-left:6px;">Bronze</span>';
-  return '';
-}
-function calcMoyModule(emd1, emd2, td, tp) {
-  var pts = 0, div = 0, emdVals = [];
-  if (emd1 !== null && emd1 !== undefined && emd1 !== 'Abs') emdVals.push(parseFloat(emd1));
-  if (emd2 !== null && emd2 !== undefined && emd2 !== 'Abs') emdVals.push(parseFloat(emd2));
-  if (emdVals.length > 0) { pts += (emdVals.reduce(function(a,b){return a+b;},0) / emdVals.length) * 1; div += 1; }
-  if (td !== null && td !== undefined && td !== 'Abs') { pts += parseFloat(td) * 2; div += 2; }
-  if (tp !== null && tp !== undefined && tp !== 'Abs') { pts += parseFloat(tp) * 2; div += 2; }
-  if (div === 0) return null;
-  return Math.round((pts / div) * 10000) / 10000;
-}
-function calcMoyGenerale(et) {
-  var total = 0, coefs = 0;
-  var modules = [
-    {key:'oce',coef:5},{key:'odf',coef:5},{key:'paro',coef:5},{key:'patho',coef:5},
-    {key:'prothese',coef:5},{key:'imagerie',coef:3},{key:'anapath',coef:1},{key:'anesthesio',coef:1},
-    {key:'pharmaco',coef:1},{key:'occluso',coef:1},{key:'oxyo',coef:1}
-  ];
-  modules.forEach(function(mod) {
-    var moy = et['moy_' + mod.key];
-    if (moy !== null && moy !== undefined && moy !== 'Abs') {
-      var n = parseFloat(moy);
-      if (!isNaN(n)) { total += n * mod.coef; coefs += mod.coef; }
-    }
-  });
-  if (coefs === 0) return null;
-  return Math.round((total / coefs) * 10000) / 10000;
-}
 var App = App || {};
 App.admin = {};
 
@@ -69,6 +6,78 @@ var adminSortKey = "numero";
 var adminSortAsc = true;
 
 App.admin.notifFilter = 'all';
+
+// Fallback au cas où ces fonctions ne seraient pas définies ailleurs
+if (typeof getPeerAccessInfo !== 'function') {
+  window.getPeerAccessInfo = function(et) {
+    if (!et.peer_view) return { label: '—', html: '<span style="color:var(--text-muted);font-size:0.82rem;">—</span>', count: 0 };
+    if (et.peer_view === 'ALL') return { label: 'AL', html: '<span class="badge badge-al" style="font-size:0.7rem;padding:2px 8px;">⭐ AL</span>', count: -1 };
+    try {
+      var pv = JSON.parse(et.peer_view);
+      if (Array.isArray(pv) && pv.length > 0) {
+        var total = adminData.length || 444;
+        return { label: pv.length + '/' + total, html: '<span style="font-family:\'JetBrains Mono\',monospace;font-size:0.82rem;font-weight:700;color:#a5b4fc;">' + pv.length + '<span style="color:var(--text-muted);font-weight:400;">/' + total + '</span></span>', count: pv.length };
+      }
+    } catch(e) {}
+    return { label: '—', html: '<span style="color:var(--text-muted);font-size:0.82rem;">—</span>', count: 0 };
+  };
+}
+if (typeof fn !== 'function') {
+  window.fn = function(v) {
+    if (v === null || v === undefined) return '<span class="note-abs">—</span>';
+    if (v === 'Abs') return '<span class="note-abs">Abs</span>';
+    var n = parseFloat(v); if (isNaN(n)) return v;
+    return n.toFixed(2);
+  };
+}
+if (typeof nc !== 'function') {
+  window.nc = function(v) {
+    if (v === 'Abs' || v === null || v === undefined) return 'note-abs';
+    var n = parseFloat(v); if (isNaN(n)) return '';
+    return n < 5 ? 'note-bad' : n < 10 ? 'note-mid' : 'note-good';
+  };
+}
+if (typeof getGradeBadge !== 'function') {
+  window.getGradeBadge = function(value) {
+    if (value === null || value === undefined || value === 'Abs') return '';
+    var n = parseFloat(value); if (isNaN(n)) return '';
+    if (n >= 14) return '<span class="badge badge-gold" style="padding:2px 6px;font-size:0.7rem;margin-left:6px;">Or</span>';
+    if (n >= 13) return '<span class="badge badge-silver" style="padding:2px 6px;font-size:0.7rem;margin-left:6px;">Argent</span>';
+    if (n >= 12) return '<span class="badge badge-bronze" style="padding:2px 6px;font-size:0.7rem;margin-left:6px;">Bronze</span>';
+    return '';
+  };
+}
+if (typeof calcMoyModule !== 'function') {
+  window.calcMoyModule = function(emd1, emd2, td, tp) {
+    var pts = 0, div = 0, emdVals = [];
+    if (emd1 !== null && emd1 !== undefined && emd1 !== 'Abs') emdVals.push(parseFloat(emd1));
+    if (emd2 !== null && emd2 !== undefined && emd2 !== 'Abs') emdVals.push(parseFloat(emd2));
+    if (emdVals.length > 0) { pts += (emdVals.reduce(function(a,b){return a+b;},0) / emdVals.length) * 1; div += 1; }
+    if (td !== null && td !== undefined && td !== 'Abs') { pts += parseFloat(td) * 2; div += 2; }
+    if (tp !== null && tp !== undefined && tp !== 'Abs') { pts += parseFloat(tp) * 2; div += 2; }
+    if (div === 0) return null;
+    return Math.round((pts / div) * 10000) / 10000;
+  };
+}
+if (typeof calcMoyGenerale !== 'function') {
+  window.calcMoyGenerale = function(et) {
+    var total = 0, coefs = 0;
+    var modules = [
+      {key:'oce',coef:5},{key:'odf',coef:5},{key:'paro',coef:5},{key:'patho',coef:5},
+      {key:'prothese',coef:5},{key:'imagerie',coef:3},{key:'anapath',coef:1},{key:'anesthesio',coef:1},
+      {key:'pharmaco',coef:1},{key:'occluso',coef:1},{key:'oxyo',coef:1}
+    ];
+    modules.forEach(function(mod) {
+      var moy = et['moy_' + mod.key];
+      if (moy !== null && moy !== undefined && moy !== 'Abs') {
+        var n = parseFloat(moy);
+        if (!isNaN(n)) { total += n * mod.coef; coefs += mod.coef; }
+      }
+    });
+    if (coefs === 0) return null;
+    return Math.round((total / coefs) * 10000) / 10000;
+  };
+}
 
 App.admin.loadAdmin = function () {
   var badge = document.getElementById("adminLiteBadge");
