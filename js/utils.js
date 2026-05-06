@@ -181,12 +181,10 @@ window.showToast = function (msg, type) {
 
   container.appendChild(toast);
 
-  // Déclenchement de l'entrée
   setTimeout(function () {
     toast.classList.add("show");
   }, 20);
 
-  // Sortie après 4 secondes
   setTimeout(function () {
     toast.classList.remove("show");
     setTimeout(function () {
