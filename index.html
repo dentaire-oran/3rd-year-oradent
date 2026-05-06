@@ -234,6 +234,11 @@
     <button class="btn-sm btn-ghost-sm filter-notif" data-filter="connexion">Connexions</button>
     <button class="btn-sm btn-ghost-sm filter-notif" data-filter="compte">Comptes</button>
   </div>
+  <button id="deleteAllFilteredBtn" class="btn-ghost hidden" onclick="App.admin.deleteFilteredNotifs()" style="margin-bottom:1rem;">
+    <i class="ph-bold ph-trash"></i> Supprimer les notifications de cette section
+  </button>
+  <div id="notifsList"><p class="text-center py-8" style="color:var(--text-muted);">Chargement...</p></div>
+</div>
   <div id="notifsList"><p class="text-center py-8" style="color:var(--text-muted);">Chargement...</p></div>
 </div>
   <div id="panelComptes" class="hidden"><div id="comptesList"><p class="text-center py-8" style="color:var(--text-muted);" data-i18n="loading">Chargement...</p></div></div>
