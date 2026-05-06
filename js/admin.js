@@ -1014,12 +1014,15 @@ App.admin.recalculerTout = async function () {
   btn.disabled = true;
   btn.innerHTML = '<div class="spinner"></div> Calcul en cours...';
 
+  var url = (typeof SUPABASE_URL !== 'undefined' ? SUPABASE_URL : App.config.SUPABASE_URL);
+  var key = (typeof SUPABASE_KEY !== 'undefined' ? SUPABASE_KEY : App.config.SUPABASE_KEY);
+
   try {
-    var res = await fetch(SUPABASE_URL + "/rest/v1/rpc/recalculer_toutes_moyennes", {
+    var res = await fetch(url + "/rest/v1/rpc/recalculer_toutes_moyennes", {
       method: "POST",
       headers: {
-        "apikey": SUPABASE_KEY,
-        "Authorization": "Bearer " + SUPABASE_KEY,
+        "apikey": key,
+        "Authorization": "Bearer " + key,
         "Content-Type": "application/json"
       }
     });
