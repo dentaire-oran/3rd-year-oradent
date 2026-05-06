@@ -191,3 +191,27 @@ window.showToast = function (msg, type) {
     }, 400);
   }, 4000);
 };
+
+window.showConfirm = function (message) {
+  return new Promise(function (resolve) {
+    var modal = document.getElementById("confirmModal");
+    var msg = document.getElementById("confirmMsg");
+    var okBtn = document.getElementById("confirmOk");
+    var cancelBtn = document.getElementById("confirmCancel");
+
+    msg.textContent = message;
+    modal.classList.remove("hidden");
+
+    function cleanup() {
+      modal.classList.add("hidden");
+      okBtn.removeEventListener("click", onOk);
+      cancelBtn.removeEventListener("click", onCancel);
+    }
+
+    function onOk() { cleanup(); resolve(true); }
+    function onCancel() { cleanup(); resolve(false); }
+
+    okBtn.addEventListener("click", onOk);
+    cancelBtn.addEventListener("click", onCancel);
+  });
+};
