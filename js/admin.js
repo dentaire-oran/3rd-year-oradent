@@ -7,7 +7,6 @@ var adminSortAsc = true;
 
 App.admin.notifFilter = 'all';
 
-// Fallback au cas où ces fonctions ne seraient pas définies ailleurs
 if (typeof getPeerAccessInfo !== 'function') {
   window.getPeerAccessInfo = function(et) {
     if (!et.peer_view) return { label: '—', html: '<span style="color:var(--text-muted);font-size:0.82rem;">—</span>', count: 0 };
