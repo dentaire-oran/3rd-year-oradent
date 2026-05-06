@@ -113,6 +113,7 @@ html[dir="rtl"] .nav-link:hover { transform:translateX(-4px); }
 .device-tablet { background:rgba(255,201,74,0.15); color:var(--warning); border:1px solid rgba(255,201,74,0.3); }
 .spinner { width:20px; height:20px; border:2px solid var(--glass-border); border-top-color:#818cf8; border-radius:50%; animation:spin 0.7s linear infinite; }
 @keyframes spin { to { transform:rotate(360deg); } }
+
 #toastContainer {
   position: fixed;
   bottom: 2rem;
@@ -124,6 +125,7 @@ html[dir="rtl"] .nav-link:hover { transform:translateX(-4px); }
   pointer-events: none;
   max-width: 360px;
 }
+
 .toast-item {
   padding: 0.9rem 1.25rem;
   border-radius: 1rem;
@@ -139,16 +141,21 @@ html[dir="rtl"] .nav-link:hover { transform:translateX(-4px); }
   align-items: center;
   gap: 0.75rem;
   pointer-events: auto;
-  animation: toastIn 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards;
-  transition: all 0.4s ease;
+  opacity: 0;
+  transform: translateX(100px);
+  transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
 }
-.toast-item.hide {
-  animation: toastOut 0.4s ease forwards;
+
+.toast-item.show {
+  opacity: 1;
+  transform: translateX(0);
 }
+
 .toast-item i {
   font-size: 1.25rem;
   flex-shrink: 0;
 }
+
 .toast-item.success {
   border-left-color: var(--success);
   background: rgba(42,212,165,0.15);
@@ -165,6 +172,7 @@ html[dir="rtl"] .nav-link:hover { transform:translateX(-4px); }
   border-left-color: #a5b4fc;
   background: rgba(165,180,252,0.15);
 }
+
 [data-theme="light"] .toast-item {
   background: rgba(255,255,255,0.8);
   color: #312e81;
@@ -182,30 +190,7 @@ html[dir="rtl"] .nav-link:hover { transform:translateX(-4px); }
 [data-theme="light"] .toast-item.info {
   background: rgba(79,70,229,0.12);
 }
-@keyframes toastIn {
-  0% {
-    transform: translateX(80px) scale(0.9);
-    opacity: 0;
-  }
-  70% {
-    transform: translateX(-8px) scale(1.02);
-    opacity: 1;
-  }
-  100% {
-    transform: translateX(0) scale(1);
-    opacity: 1;
-  }
-}
-@keyframes toastOut {
-  0% {
-    transform: translateX(0) scale(1);
-    opacity: 1;
-  }
-  100% {
-    transform: translateX(80px) scale(0.8);
-    opacity: 0;
-  }
-}
+
 #breadcrumb { padding:3px 8px !important; }
 .breadcrumb-btn { display:inline-flex; align-items:center; gap:4px; padding:2px 8px; border-radius:99px; font-size:0.72rem; font-weight:500; color:var(--text-muted); transition:all 0.2s ease; cursor:pointer; background:none; border:none; }
 .breadcrumb-btn:hover { color:var(--text-main); background:var(--btn-hover); }
