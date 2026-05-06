@@ -1008,21 +1008,15 @@ App.admin.renderModuleRanking = function () {
 
 // ******** BOUTON RECALCULER ********
 App.admin.recalculerTout = async function () {
-  var url = (typeof SUPABASE_URL !== 'undefined' ? SUPABASE_URL : (App.config && App.config.SUPABASE_URL ? App.config.SUPABASE_URL : "INCONNUE"));
-  var key = (typeof SUPABASE_KEY !== 'undefined' ? SUPABASE_KEY : (App.config && App.config.SUPABASE_KEY ? App.config.SUPABASE_KEY : "INCONNUE"));
-
-  alert("URL utilisée : " + url + "\nClé utilisée : " + key.substring(0, 10) + "...");
-
-  if (url === "INCONNUE" || key === "INCONNUE") {
-    alert("Erreur : Impossible de trouver l'URL ou la clé API.");
-    return;
-  }
-
-  if (!confirm("Lancer le recalcul ?")) return;
+  if (!confirm("Recalculer toutes les moyennes et classements ? Cela peut prendre quelques secondes.")) return;
 
   var btn = document.getElementById("btnRecalculer");
   btn.disabled = true;
   btn.innerHTML = '<div class="spinner"></div> Calcul en cours...';
+
+  // valeurs codées en dur (identiques à celles de ton projet)
+  var url = "https://wjhugpnjapsyysgsxrtp.supabase.co";
+  var key = "sb_publishable_zOYqcJMGGvqSFeR5kHT5lg_3xHXoP7s";
 
   try {
     var res = await fetch(url + "/rest/v1/rpc/recalculer_toutes_moyennes", {
@@ -1034,15 +1028,12 @@ App.admin.recalculerTout = async function () {
       }
     });
     if (res.ok) {
-      alert("Succès !");
       showToast("Moyennes et classement recalculés avec succès !", "success");
       App.admin.loadAdmin();
     } else {
-      alert("Échec de la requête. Statut : " + res.status);
       showToast("Erreur lors du recalcul", "danger");
     }
   } catch (e) {
-    alert("Erreur de connexion : " + e.message);
     showToast("Erreur de connexion", "danger");
   } finally {
     btn.disabled = false;
