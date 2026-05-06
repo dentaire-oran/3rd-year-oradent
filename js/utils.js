@@ -147,6 +147,8 @@ function getPeerAccessInfo(et) {
   return { label: t("accessNone"), html: '<span style="color:var(--text-muted);font-size:0.82rem;">—</span>', count: 0 };
 }
 
+alert("utils.js chargé avec succès !");
+
 window.showToast = function (msg, type) {
   type = type || "info";
   var colors = {
