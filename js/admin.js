@@ -5,6 +5,8 @@ var adminData = [];
 var adminSortKey = "numero";
 var adminSortAsc = true;
 
+App.admin.notifFilter = 'all';
+
 App.admin.loadAdmin = function () {
   var badge = document.getElementById("adminLiteBadge");
   if (isAdminLite) badge.classList.remove("hidden");
@@ -207,7 +209,7 @@ App.admin.switchTab = function (tabName) {
 App.admin.loadNotifs = function () {
   fetch(
     SUPABASE_URL +
-      "/rest/v1/notifications?select=*&order=created_at.desc&limit=100",
+      "/rest/v1/notifications?select=*&order=created_at.desc&limit=200",
     { headers: SB_HEADERS }
   )
     .then(function (r) {
@@ -218,14 +220,37 @@ App.admin.loadNotifs = function () {
         App.admin.renderNotifs([]);
         return;
       }
-      var unread = notifs.filter(function (n) {
-        return !n.lu;
-      }).length;
-      if (unread > 0) {
-        document.getElementById("notifCount").textContent = unread;
-        document.getElementById("notifCount").classList.remove("hidden");
+
+      var filter = App.admin.notifFilter || 'all';
+      var filtered = notifs;
+      if (filter === 'erreur') {
+        filtered = notifs.filter(function (n) {
+          return n.type === 'Erreur de note' || n.type === 'Note manquante' || n.type === 'Autre';
+        });
+      } else if (filter === 'suggestion') {
+        filtered = notifs.filter(function (n) {
+          return n.type && n.type.toLowerCase().indexOf('suggestion') !== -1;
+        });
+      } else if (filter === 'connexion') {
+        filtered = notifs.filter(function (n) {
+          return n.type === 'Connexion' || n.type === 'Connection' || n.type === 'اتصال';
+        });
+      } else if (filter === 'compte') {
+        filtered = notifs.filter(function (n) {
+          return n.type === 'Modification de compte' || n.type === 'Account modification' || n.type === 'تعديل الحساب';
+        });
       }
-      App.admin.renderNotifs(notifs);
+
+      var unread = notifs.filter(function (n) { return !n.lu; }).length;
+      var badge = document.getElementById("notifCount");
+      if (unread > 0) {
+        badge.textContent = unread;
+        badge.classList.remove("hidden");
+      } else {
+        badge.classList.add("hidden");
+      }
+
+      App.admin.renderNotifs(filtered);
     });
 };
 
@@ -297,12 +322,40 @@ App.admin.renderNotifs = function (notifs) {
         : "") +
       deviceBadge +
       "</div>" +
-      "<div style='font-size:0.75rem;color:var(--text-muted);white-space:nowrap;'>" +
-      n.date +
-      "</div></div>";
+      '<div style="display:flex;align-items:center;gap:0.5rem;">' +
+        '<div style="font-size:0.75rem;color:var(--text-muted);white-space:nowrap;">' + n.date + '</div>' +
+        '<button class="btn-sm btn-danger-sm" style="padding:0.25rem 0.5rem;" onclick="App.admin.deleteNotification(' + n.id + ')"><i class="ph-bold ph-trash"></i></button>' +
+      '</div></div>';
     el.appendChild(div);
   });
 };
+
+App.admin.deleteNotification = function (id) {
+  if (!confirm('Supprimer cette notification ?')) return;
+  fetch(SUPABASE_URL + '/rest/v1/notifications?id=eq.' + id, {
+    method: 'DELETE',
+    headers: SB_HEADERS
+  })
+    .then(function (r) {
+      if (r.ok) {
+        showToast('Notification supprimée', 'success');
+        App.admin.loadNotifs();
+      } else {
+        showToast('Erreur lors de la suppression', 'danger');
+      }
+    });
+};
+
+document.addEventListener('click', function(e) {
+  if (e.target.closest('.filter-notif')) {
+    var btn = e.target.closest('.filter-notif');
+    var filter = btn.dataset.filter;
+    document.querySelectorAll('.filter-notif').forEach(function(b) { b.classList.remove('active'); });
+    btn.classList.add('active');
+    App.admin.notifFilter = filter;
+    App.admin.loadNotifs();
+  }
+});
 
 App.admin.loadComptes = function () {
   if (!adminData.length) {
@@ -1006,7 +1059,6 @@ App.admin.renderModuleRanking = function () {
   container.innerHTML = html;
 };
 
-// ******** BOUTON RECALCULER ********
 App.admin.recalculerTout = async function () {
   if (!confirm("Recalculer toutes les moyennes et classements ? Cela peut prendre quelques secondes.")) return;
 
@@ -1031,7 +1083,6 @@ App.admin.recalculerTout = async function () {
       showToast("Moyennes et classement recalculés avec succès !", "success");
       App.admin.loadAdmin();
     } else {
-      // Récupérer le message d’erreur du serveur
       var errText = await res.text();
       showToast("Erreur " + res.status + " : " + errText.slice(0, 100), "danger");
     }
