@@ -226,7 +226,16 @@
       </table>
     </div></div>
   </div>
-  <div id="panelNotifs" class="hidden"><div id="notifsList"><p class="text-center py-8" style="color:var(--text-muted);" data-i18n="loading">Chargement...</p></div></div>
+  <div id="panelNotifs" class="hidden">
+  <div style="display:flex; flex-wrap:wrap; gap:0.5rem; margin-bottom:1rem;">
+    <button class="btn-sm btn-ghost-sm filter-notif active" data-filter="all">Toutes</button>
+    <button class="btn-sm btn-ghost-sm filter-notif" data-filter="erreur">Erreurs</button>
+    <button class="btn-sm btn-ghost-sm filter-notif" data-filter="suggestion">Suggestions</button>
+    <button class="btn-sm btn-ghost-sm filter-notif" data-filter="connexion">Connexions</button>
+    <button class="btn-sm btn-ghost-sm filter-notif" data-filter="compte">Comptes</button>
+  </div>
+  <div id="notifsList"><p class="text-center py-8" style="color:var(--text-muted);">Chargement...</p></div>
+</div>
   <div id="panelComptes" class="hidden"><div id="comptesList"><p class="text-center py-8" style="color:var(--text-muted);" data-i18n="loading">Chargement...</p></div></div>
   <div id="panelClassement" class="hidden">
     <div class="glass rounded-3xl p-6 mb-4">
