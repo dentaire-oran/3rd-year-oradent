@@ -330,7 +330,6 @@ App.admin.renderComptes = function (data) {
   }
   var html = '';
 
-  // --- SECTION SUPER-ADMINS EN HAUT ---
   if (!isAdminLite) {
     html += '<div class="glass rounded-3xl p-6 mb-6">';
     html += '<h3 class="font-bold text-lg mb-4 flex items-center gap-2"><i class="ph-bold ph-shield-check"></i> ' + t("editSuperAdmin") + '</h3>';
@@ -350,7 +349,6 @@ App.admin.renderComptes = function (data) {
     html += '</div>';
   }
 
-  // --- TABLEAU DES COMPTES ÉTUDIANTS (avec colonne Rôle) ---
   html += '<div class="glass rounded-3xl overflow-hidden"><div style="overflow-x:auto;"><table class="res-table"><thead><tr>' +
     "<th>" + t("number") + "</th><th>" + t("lastName") + "</th><th>" + t("firstName") + "</th>" +
     "<th>" + t("customIdentifier") + "</th><th>" + t("customPassword") + "</th><th>" + t("actions") + "</th>" +
@@ -470,7 +468,6 @@ App.admin.changeStudentRole = function(num) {
     });
 };
 
-// ******** SAUVEGARDE DES SUPER-ADMINS ********
 App.admin.saveSuperAdmins = async function () {
   var currentPass = document.getElementById("currentAdminPass").value.trim();
   var newAdminId = document.getElementById("superAdminId").value.trim();
@@ -550,7 +547,6 @@ App.admin.saveSuperAdmins = async function () {
   }
 };
 
-// ******** GESTION DES NOTES ********
 App.admin.openEditNotes = function (num) {
   var et = adminData.find(function (e) { return e.numero === num; });
   if (!et) return;
@@ -766,7 +762,6 @@ App.admin.viewNotes = function (num) {
   document.body.appendChild(d);
 };
 
-// ******** PEER MANAGEMENT ********
 App.admin.openManagePeers = function (num) {
   var et = adminData.find(function (e) { return e.numero === num; });
   if (!et) return;
@@ -906,7 +901,6 @@ App.admin.savePeerView = function () {
     });
 };
 
-// ******** CLASSEMENT ********
 App.admin.rankModuleChanged = function () {
   var val = document.getElementById("rankModuleSelect").value;
   var subWrap = document.getElementById("rankSubSelectWrap");
@@ -1010,4 +1004,35 @@ App.admin.renderModuleRanking = function () {
   });
   html += '</tbody></table>';
   container.innerHTML = html;
+};
+
+// ******** BOUTON RECALCULER ********
+App.admin.recalculerTout = async function () {
+  if (!confirm("Recalculer toutes les moyennes et classements ? Cela peut prendre quelques secondes.")) return;
+
+  var btn = document.getElementById("btnRecalculer");
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div> Calcul en cours...';
+
+  try {
+    var res = await fetch(SUPABASE_URL + "/rest/v1/rpc/recalculer_toutes_moyennes", {
+      method: "POST",
+      headers: {
+        "apikey": SUPABASE_KEY,
+        "Authorization": "Bearer " + SUPABASE_KEY,
+        "Content-Type": "application/json"
+      }
+    });
+    if (res.ok) {
+      showToast("Moyennes et classement recalculés avec succès !", "success");
+      App.admin.loadAdmin();
+    } else {
+      showToast("Erreur lors du recalcul", "danger");
+    }
+  } catch (e) {
+    showToast("Erreur de connexion", "danger");
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = "🔄 Recalculer toutes les moyennes";
+  }
 };
