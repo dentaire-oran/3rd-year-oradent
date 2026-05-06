@@ -181,14 +181,20 @@ window.showToast = function (msg, type) {
 
   container.appendChild(toast);
 
-  // Suppression après 4s avec animation de sortie
+  // Déclenchement de l'entrée
   setTimeout(function () {
-    toast.classList.add("hide");
+    toast.classList.add("show");
+  }, 20);
+
+  // Sortie après 4 secondes
+  setTimeout(function () {
+    toast.classList.remove("show");
     setTimeout(function () {
       if (toast.parentNode) toast.remove();
-    }, 400);   // correspond à la durée de toastOut
+    }, 500);
   }, 4000);
 };
+
 window.showConfirm = function (message) {
   return new Promise(function (resolve) {
     var modal = document.getElementById("confirmModal");
