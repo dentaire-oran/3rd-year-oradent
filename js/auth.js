@@ -87,23 +87,24 @@ App.auth.findEtudiant = function(id, mdp) {
   });
 };
 
-App.auth.logConnection = function(nom, numero, type) {
+App.auth.logConnection = function (nom, numero, type) {
   var now = new Date().toLocaleString("fr-FR");
-  var deviceInfo = getDeviceShortString(), deviceFull = getDeviceDisplayString();
-  fsCreate("notifications",{
-    etudiant_nom:nom, etudiant_numero:String(numero),
-    module:t("system"), type:t("connection"), message:type,
-    date:now, lu:false, admin_only: (type.indexOf("Admin Lite")!==-1),
-    device_info:deviceInfo, device_full:deviceFull
+  var deviceInfo = getDeviceShortString();
+  var diagnostic = getDeviceDiagnostic();
+
+  fsCreate("notifications", {
+    etudiant_nom: nom,
+    etudiant_numero: String(numero),
+    module: "Système",
+    type: type,
+    message: diagnostic,
+    date: now,
+    lu: false,
+    admin_only: false,
+    device_info: deviceInfo,
+    device_full: diagnostic
   });
-  if (type.indexOf("Admin Lite")!==-1) {
-    emailjs.init(EMAILJS_KEY);
-    emailjs.send(EMAILJS_SERVICE, EMAILJS_TEMPLATE, {
-      etudiant_nom:nom, etudiant_numero:String(numero),
-      module:t("system"), type_signalement:type,
-      message:type+" — "+now+" | "+t("device")+": "+deviceFull, date:now
-    });
-  }
+ }
 };
 
 App.auth.setLoginLoading = function(on) {
