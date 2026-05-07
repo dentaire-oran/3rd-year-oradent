@@ -146,8 +146,6 @@ if ("serviceWorker" in navigator) {
   });
 }
 
-
-
 initTheme();
 initLang();
 App.updateSidebarNav();
