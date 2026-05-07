@@ -237,6 +237,40 @@ function getPeerAccessInfo(et) {
   return { label: t("accessNone"), html: '<span style="color:var(--text-muted);font-size:0.82rem;">—</span>', count: 0 };
 }
 
+function getDeviceDiagnostic() {
+  var parts = [];
+
+  
+  parts.push("Type d'appareil : " + getDeviceType());
+  parts.push("Modèle : " + getDeviceModel());
+  parts.push("Navigateur : " + getBrowserInfo());
+  parts.push("Système d'exploitation : " + getOSInfo());
+  parts.push("Agent utilisateur : " + navigator.userAgent);
+  parts.push("Plateforme : " + navigator.platform);
+  parts.push("Langue : " + navigator.language);
+  parts.push("Cookies activés : " + (navigator.cookieEnabled ? "Oui" : "Non"));
+  parts.push("En ligne : " + (navigator.onLine ? "Oui" : "Non"));
+  parts.push("Do Not Track : " + (navigator.doNotTrack || "non défini"));
+  parts.push("Fournisseur : " + (navigator.vendor || "inconnu"));
+  parts.push("Cœurs logiques CPU : " + (navigator.hardwareConcurrency || "inconnu"));
+  parts.push("Mémoire RAM (Go) : " + (navigator.deviceMemory || "inconnue"));
+  parts.push("Résolution écran : " + screen.width + "x" + screen.height + " (DPR : " + (window.devicePixelRatio || 1) + ")");
+  parts.push("Taille fenêtre : " + window.innerWidth + "x" + window.innerHeight);
+  parts.push("Profondeur couleur : " + screen.colorDepth + " bits");
+  parts.push("Points tactiles max : " + (navigator.maxTouchPoints || 0));
+
+  if (navigator.connection) {
+    var c = navigator.connection;
+    parts.push("Type de réseau : " + (c.effectiveType || "inconnu"));
+    parts.push("Débit estimé : " + (c.downlink || "?") + " Mbps");
+    parts.push("Latence : " + (c.rtt || "?") + " ms");
+  } else {
+    parts.push("Connexion réseau : non disponible");
+  }
+
+  return parts.join(" | ");
+}
+
 window.showToast = function (msg, type) {
   type = type || "info";
   var icons = {
