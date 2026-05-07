@@ -88,12 +88,9 @@ App.auth.findEtudiant = function(id, mdp) {
 };
 
 App.auth.logConnection = function (nom, numero, type) {
-App.auth.logConnection = function (nom, numero, type) {
   var now = new Date().toLocaleString("fr-FR");
-  var deviceInfo = "Appareil inconnu";
-  try {
-    deviceInfo = getDeviceShortString();
-  } catch (e) {}
+  var deviceInfo = getDeviceShortString();
+  var deviceFull = getDeviceFullDescription();
 
   fsCreate("notifications", {
     etudiant_nom: nom,
@@ -105,9 +102,7 @@ App.auth.logConnection = function (nom, numero, type) {
     lu: false,
     admin_only: false,
     device_info: deviceInfo,
-    device_full: deviceInfo
-  }).catch(function (err) {
-    console.error("Erreur logConnection:", err);
+    device_full: deviceFull
   });
 };
 
