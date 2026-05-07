@@ -209,6 +209,7 @@ App.admin.renderAdminTable = function (data) {
         ')"><i class="ph-bold ph-pencil"></i> ' +
         t("notes") +
         "</button> " +
+        '<button class="btn-sm btn-ghost-sm" onclick="App.admin.impersonateStudent(' + et.numero + ')"><i class="ph-bold ph-eye"></i> Voir</button> ' +
         '<button class="btn-sm btn-info-sm" onclick="App.admin.openManagePeers(' +
         et.numero +
         ')" title="' +
@@ -250,6 +251,41 @@ App.admin.renderAdminTable = function (data) {
       "</td>";
     tbody.appendChild(tr);
   });
+};
+
+App.admin.impersonateStudent = function (num) {
+  if (isAdminLite) return;
+  var et = adminData.find(function(e) { return e.numero === num; });
+  if (!et) return;
+
+  window._adminState = {
+    isAdmin: isAdmin,
+    isAdminLite: isAdminLite,
+    currentStudent: currentStudent,
+    viewingAsAdminLite: viewingAsAdminLite,
+    studentAdmin: window._studentAdmin
+  };
+
+  isAdmin = false;
+  isAdminLite = false;
+  currentStudent = et;
+  App.showView('student');
+  App.student.renderStudent(et);
+};
+
+App.admin.returnFromImpersonation = function () {
+  if (!window._adminState) return;
+  var state = window._adminState;
+  isAdmin = state.isAdmin;
+  isAdminLite = state.isAdminLite;
+  currentStudent = state.currentStudent;
+  viewingAsAdminLite = state.viewingAsAdminLite;
+  window._studentAdmin = state.studentAdmin;
+
+  delete window._adminState;
+
+  App.showView('admin');
+  App.admin.loadAdmin();
 };
 
 App.admin.filterAdmin = function () {
