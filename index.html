@@ -204,6 +204,12 @@
     <button id="btnRecalculer" class="btn-main" onclick="App.admin.recalculerTout()" style="margin-bottom:1rem; width:auto; padding:0.6rem 1.5rem; max-width:300px;">
       🔄 Recalculer toutes les moyennes
     </button>
+    <div id="adminStats" class="glass stat-card" style="margin-bottom:1rem; display:flex; justify-content:center; gap:2rem; flex-wrap:wrap;">
+  <div>
+    <div class="stat-val text-gradient" id="statTauxReussite">—</div>
+    <div class="stat-lbl">Taux ≥ 10</div>
+  </div>
+    </div>
     <div class="glass rounded-3xl overflow-hidden"><div style="overflow-x:auto;">
       <table class="res-table">
         <thead><tr>
