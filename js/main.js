@@ -146,6 +146,19 @@ if ("serviceWorker" in navigator) {
   });
 }
 
+// --- THEME DE TEST ---
+(function() {
+  var theme = localStorage.getItem('test_theme');
+  if (theme) {
+    var link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.id = 'test-theme-link';
+    // adapte le chemin selon où vous avez placé vos fichiers
+    link.href = 'css/themes/' + theme + '.css';
+    document.head.appendChild(link);
+  }
+})();
+
 initTheme();
 initLang();
 App.updateSidebarNav();
