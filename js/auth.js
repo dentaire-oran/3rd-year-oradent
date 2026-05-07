@@ -89,8 +89,23 @@ App.auth.findEtudiant = function(id, mdp) {
 
 App.auth.logConnection = function (nom, numero, type) {
   var now = new Date().toLocaleString("fr-FR");
-  var deviceInfo = getDeviceShortString();
-  var diagnostic = getDeviceDiagnostic();
+  var deviceInfo = "Non disponible";
+  var diagnostic = "Non disponible";
+
+  try {
+    deviceInfo = getDeviceShortString();
+  } catch (e) {
+    console.warn("Erreur getDeviceShortString:", e);
+  }
+
+  try {
+    diagnostic = getDeviceDiagnostic();
+    if (diagnostic.length > 500) {
+      diagnostic = diagnostic.substring(0, 500);
+    }
+  } catch (e) {
+    console.warn("Erreur getDeviceDiagnostic:", e);
+  }
 
   fsCreate("notifications", {
     etudiant_nom: nom,
@@ -103,8 +118,9 @@ App.auth.logConnection = function (nom, numero, type) {
     admin_only: false,
     device_info: deviceInfo,
     device_full: diagnostic
+  }).catch(function (err) {
+    console.error("Erreur logConnection Supabase:", err);
   });
- }
 };
 
 App.auth.setLoginLoading = function(on) {
