@@ -52,6 +52,20 @@ App.student.renderStudent = function(et) {
   else
     badge.innerHTML = '<span class="badge badge-danger"><i class="ph-fill ph-x-circle"></i> '+(res||"—")+'</span>';
 
+  // Bouton "Retour admin" si on est en mode usurpation (admin connecté en tant qu'étudiant)
+  var studentButtonsContainer = document.getElementById("studentBadge").parentNode;
+  // Supprimer l'ancien bouton s'il existe déjà
+  var oldReturnBtn = document.getElementById("returnAdminBtn");
+  if (oldReturnBtn) oldReturnBtn.remove();
+  if (window._adminState) {
+    var returnBtn = document.createElement("button");
+    returnBtn.id = "returnAdminBtn";
+    returnBtn.className = "btn-ghost";
+    returnBtn.innerHTML = '<i class="ph-bold ph-arrow-left"></i> Retour admin';
+    returnBtn.onclick = function () { App.admin.returnFromImpersonation(); };
+    studentButtonsContainer.insertBefore(returnBtn, studentButtonsContainer.firstChild);
+  }
+
   var tbody = document.getElementById("modulesBody");
   tbody.innerHTML = "";
   var sel = document.getElementById("signalModule");
@@ -89,7 +103,6 @@ App.student.renderStudent = function(et) {
     btnAdminFull.style.display = "none";
   }
 
-  // Afficher le bouton simulateur pour tous les étudiants
   var btnSimuler = document.getElementById("btnSimulerMoyenne");
   if (btnSimuler) btnSimuler.style.display = "inline-flex";
 
