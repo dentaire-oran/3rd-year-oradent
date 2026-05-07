@@ -2,11 +2,6 @@ var App = App || {};
 var isAdmin = false;
 var isAdminLite = false;
 var currentLang = "fr";
-var originalDoLogin = App.auth.doLogin;
-App.auth.doLogin = function () {
-  alert("doLogin est appelé !");
-  return originalDoLogin();
-};
 
 App.currentView = "login";
 
