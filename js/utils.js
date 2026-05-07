@@ -81,21 +81,23 @@ function t(key) {
 }
 
 function getGradeBadge(value) {
+function getGradeBadge(value) {
   if (value === null || value === undefined || value === "Abs") return "";
   var n = parseFloat(value); if (isNaN(n)) return "";
-  if (n >= 14) return '<span class="badge badge-gold" style="padding:2px 6px;font-size:0.7rem;margin-left:6px;">' + t("gold") + '</span>';
-  if (n >= 13) return '<span class="badge badge-silver" style="padding:2px 6px;font-size:0.7rem;margin-left:6px;">' + t("silver") + '</span>';
-  if (n >= 12) return '<span class="badge badge-bronze" style="padding:2px 6px;font-size:0.7rem;margin-left:6px;">' + t("bronze") + '</span>';
+  if (n >= 14) return " 🟡";
+  if (n >= 13) return " ⚪";
+  if (n >= 12) return " 🟤";
   return "";
 }
 
 function getRankBadge(rank) {
   if (!rank || rank === "—") return "";
   var r = parseInt(rank); if (isNaN(r)) return "";
-  if (r <= 3) return '<span class="badge badge-diamond" style="padding:2px 6px;font-size:0.7rem;margin-left:6px;">' + t("diamond") + '</span>';
+  if (r === 1) return " 🥇";
+  if (r === 2) return " 🥈";
+  if (r === 3) return " 🥉";
   return "";
 }
-
 function fn(v) {
   if (v===null||v===undefined) return '<span class="note-abs">—</span>';
   if (v==="Abs") return '<span class="note-abs">Abs</span>';
