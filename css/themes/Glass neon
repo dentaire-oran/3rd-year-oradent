@@ -1,0 +1,30 @@
+:root {
+  --bg-gradient: linear-gradient(135deg, #0a0a2e 0%, #1a0a3a 50%, #2a0a2e 100%);
+  --glass-bg: rgba(255, 255, 255, 0.1);
+  --glass-border: rgba(255, 255, 255, 0.25);
+  --text-main: #f0e6ff;
+  --text-muted: #b8a9d4;
+  --btn-hover: rgba(255, 255, 255, 0.25);
+  --pill-bg: rgba(0, 0, 0, 0.4);
+  --pill-color: #ffffff;
+  --sidebar-bg: rgba(20, 10, 40, 0.8);
+  --input-bg: rgba(0, 0, 0, 0.4);
+  --success: #00ffc8;
+  --danger: #ff4d6d;
+  --warning: #ffd166;
+  --table-header: rgba(255, 255, 255, 0.1);
+  --table-row-hover: rgba(255, 255, 255, 0.1);
+}
+/* Animations supplémentaires */
+.glass {
+  backdrop-filter: blur(30px);
+  transition: all 0.4s ease;
+}
+.glass:hover {
+  border-color: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 25px rgba(138, 43, 226, 0.4);
+}
+.btn-main {
+  background: linear-gradient(135deg, #b388ff, #7c4dff);
+  box-shadow: 0 8px 25px rgba(138, 43, 226, 0.5);
+}
