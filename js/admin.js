@@ -107,6 +107,7 @@ App.admin.loadAdmin = function () {
         return a.numero - b.numero;
       });
       App.admin.renderAdminTable(adminData);
+      App.admin.updateStats();
 
       var sel = document.getElementById("rankModuleSelect");
       sel.innerHTML = '<option value="">—</option>';
