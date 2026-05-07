@@ -100,6 +100,7 @@ App.admin.loadAdmin = function () {
       if (!data.documents) {
         adminData = [];
         App.admin.renderAdminTable([]);
+        App.admin.updateStats();
         return;
       }
       adminData = data.documents.filter(Boolean);
@@ -121,22 +122,6 @@ App.admin.loadAdmin = function () {
         opt.textContent = m.nom;
         sel.appendChild(opt);
       });
-
-      App.admin.updateStats = function () {
-  var total = adminData.length;
-  if (total === 0) {
-    document.getElementById("statTauxReussite").textContent = "—";
-    return;
-  }
-  var admis = 0;
-  adminData.forEach(function (et) {
-    var moy = parseFloat(et.moyenne_generale);
-    if (!isNaN(moy) && moy >= 10) admis++;
-  });
-  var pct = Math.round((admis / total) * 100);
-  document.getElementById("statTauxReussite").textContent = pct + "%";
-};
-      
       App.admin.switchTab("etudiants");
     })
     .catch(function (err) {
@@ -156,6 +141,26 @@ App.admin.loadAdmin = function () {
   App.admin.loadNotifs();
   App.admin.loadComptes();
   App.admin.rankModuleChanged();
+};
+
+App.admin.updateStats = function () {
+  var el = document.getElementById("statTauxReussite");
+  if (!el) return;
+  if (!adminData || adminData.length === 0) {
+    el.textContent = "—";
+    return;
+  }
+  try {
+    var admis = 0;
+    adminData.forEach(function (et) {
+      var moy = parseFloat(et.moyenne_generale);
+      if (!isNaN(moy) && moy >= 10) admis++;
+    });
+    var pct = Math.round((admis / adminData.length) * 100);
+    el.textContent = pct + "%";
+  } catch (e) {
+    el.textContent = "—";
+  }
 };
 
 App.admin.renderAdminTable = function (data) {
@@ -263,6 +268,7 @@ App.admin.filterAdmin = function () {
       })
     : adminData;
   App.admin.renderAdminTable(filtered);
+  App.admin.updateStats();
 };
 
 App.admin.sortAdmin = function (key) {
@@ -281,6 +287,7 @@ App.admin.sortAdmin = function (key) {
     return adminSortAsc ? av - bv : bv - av;
   });
   App.admin.renderAdminTable(adminData);
+  App.admin.updateStats();
 };
 
 App.admin.switchTab = function (tabName) {
@@ -412,18 +419,18 @@ App.admin.renderNotifs = function (notifs) {
       "</div>" +
       '<div style="display:flex;align-items:center;gap:0.5rem;">' +
         '<div style="font-size:0.75rem;color:var(--text-muted);white-space:nowrap;">' + n.date + '</div>' +
-        '<button class="btn-sm btn-ghost-sm" style="padding:0.25rem 0.5rem;" onclick="App.admin.showDeviceInfo(\'' + encodeURIComponent(n.device_full || n.device_info || "Aucune info") + '\')"><i class="ph-bold ph-info"></i></button>' +
+        '<button class="btn-sm btn-ghost-sm" style="padding:0.25rem 0.5rem;" onclick="App.admin.showDeviceInfo(\'' + (n.device_full || n.device_info || "Aucune info") + '\')"><i class="ph-bold ph-info"></i></button>' +
         '<button class="btn-sm btn-danger-sm" style="padding:0.25rem 0.5rem;" onclick="App.admin.deleteNotification(' + n.id + ')"><i class="ph-bold ph-trash"></i></button>' +
       '</div></div>';
     el.appendChild(div);
   });
 };
 
-App.admin.showDeviceInfo = function (encoded) {
+App.admin.showDeviceInfo = function (info) {
   var modal = document.getElementById("deviceInfoModal");
   var content = document.getElementById("deviceInfoContent");
   if (!modal || !content) return;
-  content.innerHTML = decodeURIComponent(encoded).replace(/\|/g, "<br>");
+  content.innerHTML = info.replace(/\|/g, "<br>");
   modal.classList.remove("hidden");
 };
 
