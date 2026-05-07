@@ -88,38 +88,26 @@ App.auth.findEtudiant = function(id, mdp) {
 };
 
 App.auth.logConnection = function (nom, numero, type) {
+App.auth.logConnection = function (nom, numero, type) {
   var now = new Date().toLocaleString("fr-FR");
-  var deviceInfo = "Non disponible";
-  var diagnostic = "Non disponible";
-
+  var deviceInfo = "Appareil inconnu";
   try {
     deviceInfo = getDeviceShortString();
-  } catch (e) {
-    console.warn("Erreur getDeviceShortString:", e);
-  }
-
-  try {
-    diagnostic = getDeviceDiagnostic();
-    if (diagnostic.length > 500) {
-      diagnostic = diagnostic.substring(0, 500);
-    }
-  } catch (e) {
-    console.warn("Erreur getDeviceDiagnostic:", e);
-  }
+  } catch (e) {}
 
   fsCreate("notifications", {
     etudiant_nom: nom,
     etudiant_numero: String(numero),
     module: "Système",
     type: type,
-    message: diagnostic,
+    message: "",
     date: now,
     lu: false,
     admin_only: false,
     device_info: deviceInfo,
-    device_full: diagnostic
+    device_full: deviceInfo
   }).catch(function (err) {
-    console.error("Erreur logConnection Supabase:", err);
+    console.error("Erreur logConnection:", err);
   });
 };
 
