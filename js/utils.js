@@ -81,7 +81,6 @@ function t(key) {
 }
 
 function getGradeBadge(value) {
-function getGradeBadge(value) {
   if (value === null || value === undefined || value === "Abs") return "";
   var n = parseFloat(value); if (isNaN(n)) return "";
   if (n >= 14) return " 🟡";
