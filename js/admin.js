@@ -120,6 +120,22 @@ App.admin.loadAdmin = function () {
         opt.textContent = m.nom;
         sel.appendChild(opt);
       });
+
+      App.admin.updateStats = function () {
+  var total = adminData.length;
+  if (total === 0) {
+    document.getElementById("statTauxReussite").textContent = "—";
+    return;
+  }
+  var admis = 0;
+  adminData.forEach(function (et) {
+    var moy = parseFloat(et.moyenne_generale);
+    if (!isNaN(moy) && moy >= 10) admis++;
+  });
+  var pct = Math.round((admis / total) * 100);
+  document.getElementById("statTauxReussite").textContent = pct + "%";
+};
+      
       App.admin.switchTab("etudiants");
     })
     .catch(function (err) {
